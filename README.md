@@ -1,5 +1,5 @@
 # ConquestGame
 Description:
 
-Creator:
+Creators:
 Samuel Vachon 40281580
