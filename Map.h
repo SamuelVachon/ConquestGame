@@ -3,28 +3,29 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "Player.h"
+//#include "Player.h"
 #include <string>
 #include <iostream>
+#include <list>
 
-Class Territory{
+class Territory{
     public:
     void setName(std::string name);
     void setX(int x);
     void setY(int y);
     void setIsConnected(bool isConnected);
     void setArmy(int army);
-    void setPlayer(Player* player);
+    //void setPlayer(Player* player);
     void addEdges(Territory* territory);
     
     std::string getName();
     int getX();
     int getY();
-    Territory*[] getEdges();
+    std::list<Territory*> getEdges();
     Continent* getContinent();
     bool getIsConnected();
     int getArmy();
-    Player* getPlayer();
+    //Player* getPlayer();
 
 
     private:
@@ -32,15 +33,15 @@ Class Territory{
     std::string name;
     int x;
     int y;
-    Territory*[] edges;
+    std::list<Territory*> edges;
     Continent* continent;
     bool isConnected;
     int army;
-    Player* player;
+    //Player* player;
     
 }
 
-Class Continent{
+class Continent{
 
     public:
 
@@ -50,17 +51,17 @@ Class Continent{
 
     std::string getName();
     int getNumber();
-    Territory*[] getTerritories();
+    std::list<Territory*> getTerritories();
 
     private:
 
     std::string name;
     int number;
-    Territory*[] territories;
+    std::list<Territory*> territories;
 }
 
 
-Class Map{
+class Map{
     public:
 
     void setImage(std::string image);
@@ -71,7 +72,7 @@ Class Map{
     std::string getImage();
     bool getWrap();
     bool getWarn();
-    Territory*[] getTerritories();
+    std::list<Territory*> getTerritories();
 
     bool validate();
 
@@ -80,13 +81,13 @@ Class Map{
     std::string image;
     bool wrap;
     bool warn;
-    Territory*[] territories;
+    std::list<Territory*> territories;
 
 
 
 }
 
-Class MapLoader{
+class MapLoader{
     public:
 
     void setDefaultMapFile(std::string mapFile);
