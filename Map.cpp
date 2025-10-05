@@ -12,8 +12,19 @@
     Player* player;
 */
 
+Territory::Territory(std::string& name, int x, int y){
+    this->name = name;
+    this->x = x;
+    this->y = y;
+    this->isConnected = false;
+    this->army = 0;
+};
 
-void Territory::setName(std::string name){
+Territory::~Territory(){
+    
+};
+
+void Territory::setName(std::string& name){
     this->name = name;
 }
 void Territory::setX(int x){
@@ -31,8 +42,8 @@ void Territory::setArmy(int army){
 void Territory::setPlayer(Player* player){
     this->player=player;
 }
-void addEdges(Territory* territory){
-    this->edges.insert(territory);
+void Territory::addEdges(Territory* territory){
+    this->edges.push_back(territory);
 }
    
 std::string Territory::getName(){
@@ -44,7 +55,7 @@ int Territory::getX(){
 int Territory::getY(){
     return this->y;
 }
-std::list<Territories*> Territory::getEdges(){
+std::list<Territory*> Territory::getEdges(){
     return this->edges;
 }
 Continent* Territory::getContinent(){
@@ -67,15 +78,23 @@ int number;
 std::list<Territory*> territories;
 */ 
 
+Continent::Continent(std::string& name, int number){
+    this->name = name;
+    this->number = number;
+}
 
-void Continent::setName(std::string name){
+Continent::~Continent(){
+    
+};
+
+void Continent::setName(std::string& name){
     this->name=name;
 }
 void Continent::setNumber(int number){
     this->number=number;
 }
 void Continent::addTerritory(Territory* territory){
-    this->territories.insert(territory);
+    this->territories.push_back(territory);
 }
 std::string Continent::getName(){
     return this->name;
@@ -97,7 +116,19 @@ bool warn
 std::list<Territory*> territories
 */ 
 
-void Map::setImage(std::string image){
+Map::Map(std::string& author,std::string& image, bool wrap,std::string& scroll, bool warn){
+    this->author = author;
+    this->image = image;
+    this->wrap = wrap;
+    this->scroll = scroll;
+    this->warn = warn;
+}
+
+Map::~Map(){
+    
+};
+
+void Map::setImage(std::string& image){
     this->image=image;
 }
 void Map::setWrap(bool wrap){
@@ -107,7 +138,7 @@ void Map::setWarn(bool warn){
     this->warn=warn;
 }
 void Map::addTerritory(Territory* territory){
-    this->territories.insert(territory);
+    this->territories.push_back(territory);
 }
 
 std::string Map::getImage(){
@@ -134,7 +165,19 @@ It also stores a default map.
 std::string defaultMapFile
 */ 
 
-void MapLoader::setDefaultMapFile(std::string mapFile){
+MapLoader::MapLoader(){
+
+};
+
+MapLoader::MapLoader(std::string& mapFile){
+    this->defaultMapFile = mapFile;
+}
+
+MapLoader::~MapLoader(){
+    
+};
+
+void MapLoader::setDefaultMapFile(std::string& mapFile){
     this->defaultMapFile=mapFile;
 }
 
@@ -143,10 +186,151 @@ std::string MapLoader::getDefaultMapFile(){
 }
 
 Map* MapLoader::loadMap(){
-    this->loadMap(defaultMapFile);
+    return this->loadMap(this->defaultMapFile);
 }
     
-Map* MapLoader::loadMap(std::string mapFile){
+//Take the name of a map file and load all the informations into a map object
+//Throw -1 if the file is invalid
+Map* MapLoader::loadMap(std::string& mapFile){
+    std::fstream inout;
+
+    inout.open(mapFile, ios::in);
+    std::string line;
+    std::string emptyLine;
+    if(!(getLine(inout,line))){
+        throw -1;
+    }
+    if(line != "[Map]"){
+        throw -1;
+    }
+   Map* map = this->loadMap(inout);
+
+   if(!(getLine(inout,emptyLine) || !(getLine(inout,line)))){
+    throw -1;
+   }
+   if (emptyLine!="" || line!="[Continents]"){
+    throw -1;
+   }
+
+   this->loadContinents(inout,map);
+
+   if(!(getLine(inout,line))){
+    throw -1;
+   }
+   if(line!="[Territories]"){
+    throw -1;
+   }
+
+   this->loadTerritories(inout,map);
+
+}
+
+Map* MapLoader::loadMap(std::fstream& inout){
+
+    std::string author;
+    std::string image;
+    std::string wrap;
+    std::string scroll;
+    std::string warn;
+
+
+    //Load the author name
+    author = this->getValue(inout,"author");
+    
+    //load the image file name
+    image = this->getValue(inout,"image");
+
+    //load the wrap value
+    wrap = this->getValue(inout,"wrap");
+
+    //load the scroll value
+    scroll = this->getValue(inout,"scroll")
+
+    //load the warn value
+    warn = this->getValue(inout,"warn");
+
+    //Transfer string value yes and no to boolean value easier to handle afterward
+    bool wrapBool;
+    bool warnBool;
+
+    if(wrap=="yes"){
+        wrapBool=true;
+    }
+    else if(wrap=="no"){
+        wrapBool=false;
+    }
+    else{
+        throw -1;
+    }
+
+    if(warn=="yes"){
+        warnBool=true;
+    }
+    else if(warn=="no"){
+        warnBool=false;
+    }
+    else{
+        throw -1;
+    }
+
+    return new Map(author,image,wrapBool,scroll,warnBool);
+
+
+}
+
+std::string MapLoader::getValue(std::fstream& inout, std::string& type){
+    std::string temp;
+    std::string line;
+    std::string delimiter = "=";
+
+    if(!(getLine(inout,line))){
+        throw -1;
+    };
+    std::istringstream ss(line);
+    if(!(getLine(ss,temp,delimiter))){
+        throw -1;
+    };
+    if(temp != type){
+        throw -1;
+    }
+    if(!(getLine(ss,temp))){
+        throw -1;
+    }
+    return temp;
+}
+
+void MapLoader::loadContinents(std::fstream& inout, Map* map){
+    std::string line;
+    std::string delimiter = "=";
+    std::string name;
+    std:string temp;
+    int number;
+
+    while(true){
+        if(!(getLine(inout,line))){
+            throw -1;
+        };
+        if(line==""){
+            break;
+        }
+        std::istringstream ss(line);
+        if(!getLine(ss,name,delimiter)){
+            throw -1;
+        }
+        if(!getLine(ss,temp)){
+            throw -1;
+        }
+        number = stoi(temp);
+        Continent* continent = new Continent(name,number);
+        map->addContinents(continent);
+    }
+
+void MapLoader::loadTerritories(std::fstream& inout, Map* map){
+    std::string line;
+    std::string delimiter = ",";
+    
+}
+
 
 }
 
