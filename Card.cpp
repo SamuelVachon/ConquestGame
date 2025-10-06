@@ -122,6 +122,9 @@ void Deck::returnCard(Card* card){
 Hand::Hand(): handCards{} {}
 
 Hand::~Hand(){
+    for(Card* c : handCards){
+        delete c;
+    }
     handCards.clear();
 }
 
@@ -145,6 +148,7 @@ Hand& Hand::operator=(const Hand& other){
 int Hand::size() const{
     return handCards.size();
 }
+
 void Hand::showCards(){
     for(Card* c : handCards){
         cout << "Hand shows his card: " << c->getTypeAsString() << endl;
@@ -167,6 +171,7 @@ void Hand::removeCard(Card* card){
     handCards.erase(it);
 }
 
+//Modify when player class is implemented (add order based of card to player list)
  void Hand::playCard(int index, Player* player, Deck* deck){
     if(index > size() || index < -1){
         cout << "Play card must play a card that exists in the hand!" << endl;
@@ -177,6 +182,7 @@ void Hand::removeCard(Card* card){
     card->play(player, deck);
  }
 
+ //Only to be used at the start of coding WHEN THE PLAYER CLASS ISN'T yet available
  void Hand::playCard(int index, Deck* deck){
     if(index >= size() || index < 0 ){
         throw std::invalid_argument("Play card must play a card that exists in the hand!");

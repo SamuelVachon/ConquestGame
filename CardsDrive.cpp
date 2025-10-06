@@ -27,7 +27,7 @@ void testCards() {
     cout << "Playing all cards in hand..." << endl;
     for(int i = hand.size() - 1; i >= 0; --i) {
         //When this code was written , player wasn't fully implemented
-        //As a result, use the playCard that doesn't use the player cla
+        //As a result, use the playCard that doesn't use the player class
         hand.playCard(i, &deck); // <-- REPLACE WHEN PLAYER IS IMPLEMENTED
     }
 
