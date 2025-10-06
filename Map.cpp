@@ -120,7 +120,6 @@ void Map::setTerritoriesEdges(){
     }
 }
 void Map::setContinentsTerritories(){
-    Territory* territory;
     int size = this->territories.size();
     for(int i=0;i<size;i++){
         this->continents[this->territories[i]->getContinent()]->addTerritory(i);
@@ -128,6 +127,30 @@ void Map::setContinentsTerritories(){
 }
 
 bool Map::validate(){
+    Territory* territory = this->territories[0];
+    territory->setIsConnected(true);
+    territory->setConnectedtoTrue(this);
+    for(Territory* terr : this->territories){
+        if(terr->getIsConnected()){
+            terr->setIsConnected(false);
+            continue;
+        }
+        else{
+            std::cout << "The map is not a connected graph since " << terr->getName() << " is not connected to the other territories." << std::endl;
+            return false;
+        }
+    }
+    Continent* continent;
+    int size = this->continents.size();
+    for(int i=0;i<size;i++){
+        continent = this->continents[i];
+        if(continent->validate(this, i)){
+            continue;
+        }
+        else{
+            return false;
+        }
+    }
     return true;
 }
 
@@ -177,7 +200,7 @@ bool MapLoader::getline(std::ifstream& inout, std::string& line){
     if(line.back() == '\r' || line.back() == '\n'){
         line.pop_back();
     }
-    std::cout << line << std::endl;
+    //std::cout << line << std::endl;
     return true;
 }
 
@@ -192,7 +215,7 @@ bool MapLoader::getline(std::istringstream& ss, std::string& line, char delimite
     if(line.back() == '\r' || line.back() == '\n'){
         line.pop_back();
     }
-    std::cout << line << std::endl;
+    //std::cout << line << std::endl;
     return true;
 }
     

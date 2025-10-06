@@ -4,7 +4,7 @@
 Methods for class Continent, this is a class responsible to keep track which territory are in which continent. 
 std::string name;
 int number;
-std::list<int> territories;
+std::list<int> territoriesIndex;
 */ 
 
 Continent::Continent(std::string& tempName, int tempNumber){
@@ -32,7 +32,20 @@ bool Continent::compare(Continent* continent){
     }
     return false;
 }
-bool Continent::validate(){
+bool Continent::validate(Map* map, int index){
+    int territory = this->territoriesIndex[0];
+    map->getTerritories()[territory]->setIsConnected(true);
+    map->getTerritories()[territory]->setConnectedtoTrue(map, index); 
+    for(int terr : this->territoriesIndex){
+        if(map->getTerritories()[terr]->getIsConnected()){
+            map->getTerritories()[terr]->setIsConnected(false);
+            continue;
+        }
+        else{
+            std::cout << "The continent" << this->getName() <<  "is not a connected sub graph since " << map->getTerritories()[terr]->getName() << " is not connected to the other territories." << std::endl;
+            return false;
+        }
+    }
     return true;
 }
 

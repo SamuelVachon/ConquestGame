@@ -25,7 +25,8 @@ class Continent{
     void setNumber(int number);
     void addTerritory(int territory);
     bool compare(Continent* continent);
-    bool validate();
+    bool validate(Map* map, int index);
+
 
     std::string getName();
     int getNumber();
@@ -53,8 +54,8 @@ class Territory{
     void setPlayer(Player* player);
     void addEdges(int i);
     void addEgdesNames(std::string& name);
-    void setConnectedtoTrue();
-    void setConnectedtoTrue(int continentIndex);
+    void setConnectedtoTrue(Map* map);
+    void setConnectedtoTrue(Map* map, int continentIndex);
 
     std::string getName();
     int getX();

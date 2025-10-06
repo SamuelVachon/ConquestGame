@@ -52,11 +52,46 @@ void Territory::addEgdesNames(std::string& name){
     this->edgesNames.push_back(name);
 }
 
-void Territory::setConnectedtoTrue(){
-    
+void Territory::setConnectedtoTrue(Map* map){
+    std::stack<int> connectedTerritories;
+    int temp;
+    for(int edge : this->edgesIndex){
+        if(map->getTerritories()[edge]->getIsConnected()){
+            continue;
+        }
+        else{
+            map->getTerritories()[edge]->setIsConnected(true);
+            connectedTerritories.push(edge);
+        } 
+    }
+    while(!connectedTerritories.empty()){
+        temp = connectedTerritories.top();
+        map->getTerritories()[temp]->setConnectedtoTrue(map);
+        connectedTerritories.pop();
+    }
 }
-void Territory::setConnectedtoTrue(int continentIndex){
-    
+void Territory::setConnectedtoTrue(Map* map,int continentIndex){
+    std::stack<int> connectedTerritories;
+    int temp;
+    for(int edge : this->edgesIndex){
+        if(map->getTerritories()[edge]->getIsConnected()){
+            continue;
+        }
+        else{
+            if((map->getTerritories()[edge]->getContinent()) == continentIndex){
+                map->getTerritories()[edge]->setIsConnected(true);
+                connectedTerritories.push(edge);
+            }
+            else{
+                continue;
+            }           
+        } 
+    }
+    while(!connectedTerritories.empty()){
+        temp = connectedTerritories.top();
+        map->getTerritories()[temp]->setConnectedtoTrue(map, continentIndex);
+        connectedTerritories.pop();
+    }
 }
 
    
