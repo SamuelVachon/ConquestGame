@@ -4,7 +4,7 @@
 Methods for class Continent, this is a class responsible to keep track which territory are in which continent. 
 std::string name;
 int number;
-std::list<int> territoriesIndex;
+std::vector<int> territoriesIndex;
 */ 
 
 Continent::Continent(std::string& tempName, int tempNumber){
