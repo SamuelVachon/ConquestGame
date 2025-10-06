@@ -8,8 +8,8 @@ Methods for class Map, this is the class responsible to store all the territorie
     bool wrap;
     std::string scroll;
     bool warn;
-    std::list<Territory*> territories;
-    std::list<Continent*> continents;
+    std::vector<Territory*> territories;
+    std::vector<Continent*> continents;
 */ 
 
 Map::Map(std::string& tempAuthor,std::string& tempImage, bool tempWrap,std::string& tempScroll, bool tempWarn){
