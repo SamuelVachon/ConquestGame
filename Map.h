@@ -6,7 +6,7 @@
 //#include "Player.h"
 #include <string>
 #include <iostream>
-#include <list>
+#include <vector>
 #include <fstream>
 #include <sstream>
 #include <stack>
@@ -23,13 +23,13 @@ class Continent{
     ~Continent();
     void setName(std::string& name);
     void setNumber(int number);
-    void addTerritory(Territory* territory);
+    void addTerritory(int territory);
     bool compare(Continent* continent);
     bool validate();
 
     std::string getName();
     int getNumber();
-    std::list<Territory*> getTerritories();
+    std::vector<int> getTerritories();
 
     std::string toString();
 
@@ -37,13 +37,13 @@ class Continent{
 
     std::string name;
     int number;
-    std::list<Territory*> territories;
+    std::vector<int> territoriesIndex;
 };
 
 class Territory{
     public:
 
-    Territory(std::string& tempName, int tempx, int tempy, Continent* tempContinent);
+    Territory(std::string& tempName, int tempx, int tempy, int tempContinent);
     ~Territory();
     void setName(std::string& name);
     void setX(int x);
@@ -51,18 +51,18 @@ class Territory{
     void setIsConnected(bool isConnected);
     void setArmy(int army);
     void setPlayer(Player* player);
-    void addEdges(Territory* territory);
+    void addEdges(int i);
     void addEgdesNames(std::string& name);
-    void setTerritoriesEdges(Map* map);
     void setConnectedtoTrue();
-    void setConnectedtoTrue(Continent* continent);
+    void setConnectedtoTrue(int continentIndex);
 
     std::string getName();
     int getX();
     int getY();
-    std::list<Territory*> getEdges();
-    std::list<std::string> getEdgesNames();
-    Continent* getContinent();
+    int continent;
+    std::vector<int> getEdges();
+    std::vector<std::string> getEdgesNames();
+    int getContinent();
     bool getIsConnected();
     int getArmy();
     Player* getPlayer();
@@ -76,12 +76,12 @@ class Territory{
     std::string name;
     int x;
     int y;
-    std::list<Territory*> edges;
-    Continent* continent;
+    std::vector<int> edgesIndex;
+    int continentIndex;
     bool isConnected;
     int army;
     Player* player;
-    std::list<std::string> edgesNames;
+    std::vector<std::string> edgesNames;
     
 };
 
@@ -104,11 +104,12 @@ class Map{
     bool getWrap();
     std::string getScroll();
     bool getWarn();
-    std::list<Territory*> getTerritories();
-    std::list<Continent*> getContinents();
-    Territory* getTerritory(std::string territoryName);
-    Continent* getContinent(std::string continentName);
+    std::vector<Territory*> getTerritories();
+    std::vector<Continent*> getContinents();
+    int getTerritory(std::string territoryName);
+    int getContinent(std::string continentName);
     void setTerritoriesEdges();
+    void setContinentsTerritories();
 
     bool validate();
 
@@ -121,8 +122,8 @@ class Map{
     bool wrap;
     std::string scroll;
     bool warn;
-    std::list<Territory*> territories;
-    std::list<Continent*> continents;
+    std::vector<Territory*> territories;
+    std::vector<Continent*> continents;
 };
 
 class MapLoader{
@@ -139,15 +140,13 @@ class MapLoader{
 
     private:
   
+    bool getline(std::ifstream& inout, std::string& line);
+    bool getline(std::istringstream& ss, std::string& line, char delimiter);
     Map* loadMap(std::ifstream& inout);
     std::string getValue(std::ifstream& inout, std::string type);
     void loadContinents(std::ifstream& inout, Map* map);
     void loadTerritories(std::ifstream& inout, Map* map);
     std::string defaultMapFile;
-    Territory* territory;
-    Continent* continent;
-    
-    
 };
 
 #endif
