@@ -4,7 +4,8 @@
 #include "Card.h"     
 #include "Orders.h"   
 
-// Default constructor: Creates a new player named "Player", empty container allocation to territories, a new hand and a new OrdersList
+/* Default constructor: Creates a new player named "Player", empty container allocation
+to territories, a new hand and a new OrdersList*/
 Player::Player() 
 : name_(new std::string("Player")),
   terrs_(new std::vector<Territory*>()),
@@ -18,7 +19,8 @@ Player::Player(const std::string& name)
   hand_(new Hand()),
   orders_(new OrdersList()) {}
 
-//Copy constructor: Initializes all pointer to nullptr, uses deepCopyForm to make a deep copy of another Player object (New dynamic memory allocation)
+/*Copy constructor: Initializes all pointer to nullptr, uses deepCopyForm to make a deep copy of 
+another Player object (New dynamic memory allocation) */
 Player::Player(const Player& other)
 : name_(nullptr), terrs_(nullptr), hand_(nullptr), orders_(nullptr) {
     deepCopyFrom(other);
@@ -33,7 +35,8 @@ Player::~Player() {
     delete orders_; orders_ = nullptr;
 }
 
-//Copy assignment operator: prevents self assignemt - Delete aby existing resources, then deep copies the cintents another player
+/*Copy assignment operator: prevents self assignemt - Delete aby existing resources, then deep
+copies the cintents another player */
 Player& Player::operator=(const Player& other) {
     if (this != &other) {
         delete name_;   name_ = nullptr;
