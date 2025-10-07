@@ -5,8 +5,8 @@
     std::string name;
     int x;
     int y;
-    std::vector<int> edgesIndex;
-    int continentIndex;
+    std::vector<int> edgesIndex; -> represent the index in the map object territories attribute, possibility of improvement by using pointers
+    int continentIndex; -> represent the index in the map object continents attribute
     bool isConnected;
     int army;
     Player* player;
