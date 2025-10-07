@@ -52,6 +52,9 @@ void Territory::addEgdesNames(std::string& name){
     this->edgesNames.push_back(name);
 }
 
+//Helper method for the validate function of the Class map, this function set the value of 
+//the isConnected attribute to true for all territories that can be reached stating from 
+//the object instance on which it is called onto
 void Territory::setConnectedtoTrue(Map* map){
     std::stack<int> connectedTerritories;
     int temp;
@@ -70,6 +73,9 @@ void Territory::setConnectedtoTrue(Map* map){
         connectedTerritories.pop();
     }
 }
+//Helper method for the validate function of the Class continent, this function set the value of 
+//the isConnected attribute to true for all territories that can be reached stating from 
+//the object instance on which it is called onto if it is part of the same continent as iy
 void Territory::setConnectedtoTrue(Map* map,int continentIndex){
     std::stack<int> connectedTerritories;
     int temp;
