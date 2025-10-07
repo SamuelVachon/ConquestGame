@@ -32,6 +32,8 @@ bool Continent::compare(Continent* continent){
     }
     return false;
 }
+
+//Returne true if the Continent is a connected subgraph, return false otherwise
 bool Continent::validate(Map* map, int index){
     int territory = this->territoriesIndex[0];
     map->getTerritories()[territory]->setIsConnected(true);
