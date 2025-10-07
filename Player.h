@@ -1,5 +1,7 @@
-#pragma once
-#include <iosfwd>
+#pragma once      
+//Making sure header file is only included once per complilation unit 
+
+#include <iosfwd> 
 #include <vector>
 #include <string>
 
