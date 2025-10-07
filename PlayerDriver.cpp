@@ -13,22 +13,23 @@ void testPlayers() {
     std::cout << "=== testPlayers() ===\n";
 
     // Build a tiny continent + a few territories using your teammate's API
-    std::string contName = "North America";
-    Continent continent(contName, 5);
+    MapLoader* loader = new MapLoader();
+    std::string mapFile = "./Maps/Earth.map";
+    Map* map = loader->loadMap(mapFile);
+    delete loader;
+    
+    std::vector<Continent*> continents = map->getContinents();
+    std::vector<Territory*> territories = map->getTerritories();
 
-    std::string n1 = "Alaska";
-    std::string n2 = "Ontario";
-    std::string n3 = "Quebec";
-
-    Territory t1(n1, 0, 0, &continent);
-    Territory t2(n2, 1, 0, &continent);
-    Territory t3(n3, 2, 0, &continent);
+    Territory* t1 = territories[continents[0]->getTerritories()[0]];
+    Territory* t2 = territories[continents[0]->getTerritories()[1]];
+    Territory* t3 = territories[continents[0]->getTerritories()[2]];
 
     // Player with territories, hand, and orders list
     Player p("Alice");
-    p.addTerritory(&t1);
-    p.addTerritory(&t2);
-    p.addTerritory(&t3);
+    p.addTerritory(t1);
+    p.addTerritory(t2);
+    p.addTerritory(t3);
 
     // Give the player a Hand using the real Card API
     Hand* h = new Hand();
