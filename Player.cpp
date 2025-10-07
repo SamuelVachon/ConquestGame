@@ -58,6 +58,7 @@ void Player::issueOrder() {
 }
 
 void Player::addTerritory(Territory* t) {
+    t->setPlayer(this);
     if (t) terrs_->push_back(t);
 }
 
