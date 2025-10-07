@@ -6,7 +6,7 @@
 #include <memory>
 #include <iosfwd>
 
-// Forward decls to avoid heavy includes in header
+
 class Map;
 class MapLoader;    // from Map.h
 class Player;       // from Player.h
@@ -79,3 +79,4 @@ private:
 std::ostream& operator<<(std::ostream& os, const GameEngine& ge);
 
 #endif // GAMEENGINE_H
+
