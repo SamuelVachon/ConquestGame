@@ -77,6 +77,7 @@ std::vector<Continent*> Map::getContinents(){
     return this->continents;
 }
 
+//Return the index fot the territories atribute based on the name of the territory to find
 int Map::getTerritory(std::string territoryName){
     std::string temp;
     int size=this->territories.size();
@@ -89,6 +90,7 @@ int Map::getTerritory(std::string territoryName){
     throw -1;
 }
 
+//Return the index for the continents attribute based on the name of the continent to find
 int Map::getContinent(std::string continentName){
     std::string temp;
     int size = this->continents.size();
@@ -101,6 +103,8 @@ int Map::getContinent(std::string continentName){
     throw -2;
 }
 
+//Helper function for the loadMap() function, Since the file only contains the name of the 
+//territories that borders them, this function find the index of each edges and add it to the edges attribute of the territory
 void Map::setTerritoriesEdges(){
     std::vector<int> edgesIndex;
     std::vector<std::string> edgesNames;
@@ -119,6 +123,9 @@ void Map::setTerritoriesEdges(){
         }
     }
 }
+
+//Helper function for the loadMap() function, the territories already holds the continent
+//This function add each territory index that are part of a continent to said continent attribute territories
 void Map::setContinentsTerritories(){
     int size = this->territories.size();
     for(int i=0;i<size;i++){
@@ -126,6 +133,7 @@ void Map::setContinentsTerritories(){
     }
 }
 
+//Return true if the map is a connected graph anf if all continents are connected subgraph
 bool Map::validate(){
     Territory* territory = this->territories[0];
     territory->setIsConnected(true);
@@ -220,7 +228,7 @@ bool MapLoader::getline(std::istringstream& ss, std::string& line, char delimite
 }
     
 //Take the name of a map file and load all the informations into a map object
-//Throw -1 if the file is invalid
+//Throw a negative number if the file is invalid, Posibility of improvement by throwing error messages instead 
 Map* MapLoader::loadMap(std::string& mapFile){
     std::ifstream inout(mapFile);
 
