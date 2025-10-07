@@ -2,7 +2,8 @@
 #include <iostream>
 #include <algorithm>
 #include "Card.h"     
-#include "Orders.h"   
+#include "Orders.h"  
+#include "Map.h" 
 
 /* Default constructor: Creates a new player named "Player", empty container allocation
 to territories, a new hand and a new OrdersList*/

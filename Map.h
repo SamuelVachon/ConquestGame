@@ -60,7 +60,7 @@ class Territory{
     std::string getName();
     int getX();
     int getY();
-    int continent;
+
     std::vector<int> getEdges();
     std::vector<std::string> getEdgesNames();
     int getContinent();
@@ -81,6 +81,7 @@ class Territory{
     int continentIndex;
     bool isConnected;
     int army;
+    int continent;
     Player* player;
     std::vector<std::string> edgesNames;
     
