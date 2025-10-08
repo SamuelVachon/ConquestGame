@@ -23,8 +23,9 @@ public:
     ~Player();                               // destructor (release dynamic memory)
     Player& operator=(const Player& other);  // copy assignment operator
 
-    const std::string& getName() const; // return player name 
-// returns list of territories owned and to attack
+    const std::string& getName() const; // return player name
+
+    // returns list of territories owned and to attack
     std::vector<Territory*> toDefend() const;
     std::vector<Territory*> toAttack() const;
     void issueOrder();                       // creates an Order and adds to list
@@ -54,11 +55,11 @@ public:
     bool hasTruceWith(Player* p) const;
 
     // Hand getter
-    Hand* getHand() const;      
+    Hand* getHand() const;
 
 private:
     // Per assignment: user-defined members as pointer types
-    std::string* name_;   
+    std::string* name_;
     std::vector<Territory*>* terrs_;
     Hand*        hand_;
     OrdersList*  orders_;
@@ -66,10 +67,10 @@ private:
 
 // Internal helper
     void deepCopyFrom(const Player& other); // deep copy used in copy constructor
+    // ====== A2 Part 4 Fields ======
+    int reinforce_ = 0;
+    bool conqueredThisTurn_ = false;
+    std::vector<Player*> negotiated_;
 
-// ====== A2 Part 4 Fields ======
-int reinforce_ = 0;
-bool conqueredThisTurn_ = false;
-std::vector<Player*> negotiated_;
 };
 
