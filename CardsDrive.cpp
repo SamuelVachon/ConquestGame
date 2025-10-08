@@ -34,8 +34,3 @@ void testCards() {
     cout << "Hand size after playing: " << hand.size() << endl;
     cout << "Deck size after returning cards: " << deck.size() << endl;
 }
-//
-//int main() {
-//    testCards();
-//    return 0;
-//}

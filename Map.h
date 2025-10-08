@@ -55,7 +55,7 @@ class Territory{
     void setArmy(int army);
     void setPlayer(Player* player);
     void addEdges(int i);
-    void addEgdesNames(std::string& name);
+    void addEdgesNames(std::string& name);
     void setConnectedtoTrue(Map* map);
     void setConnectedtoTrue(Map* map, int continentIndex);
 

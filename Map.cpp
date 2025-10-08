@@ -1,11 +1,11 @@
 #include "Map.h"
 
 /*
-Methods for class Continent, this is a class responsible to keep track which territory are in which continent. 
+Methods for class Continent, this is a class responsible to keep track which territory are in which continent.
 std::string name;
 int number;
 std::vector<int> territoriesIndex; -> represent the index in the map object territories attribute
-*/ 
+*/
 
 Continent::Continent(std::string& tempName, int tempNumber){
     this->name = tempName;
@@ -37,7 +37,7 @@ bool Continent::compare(Continent* continent){
 bool Continent::validate(Map* map, int index){
     int territory = this->territoriesIndex[0];
     map->getTerritories()[territory]->setIsConnected(true);
-    map->getTerritories()[territory]->setConnectedtoTrue(map, index); 
+    map->getTerritories()[territory]->setConnectedtoTrue(map, index);
     for(int terr : this->territoriesIndex){
         if(map->getTerritories()[terr]->getIsConnected()){
             map->getTerritories()[terr]->setIsConnected(false);
@@ -114,12 +114,12 @@ void Territory::setPlayer(Player* player){
 void Territory::addEdges(int i){
     this->edgesIndex.push_back(i);
 }
-void Territory::addEgdesNames(std::string& name){
+void Territory::addEdgesNames(std::string& name){
     this->edgesNames.push_back(name);
 }
 
-//Helper method for the validate function of the Class map, this function set the value of 
-//the isConnected attribute to true for all territories that can be reached stating from 
+//Helper method for the validate function of the Class map, this function set the value of
+//the isConnected attribute to true for all territories that can be reached stating from
 //the object instance on which it is called onto
 void Territory::setConnectedtoTrue(Map* map){
     std::stack<int> connectedTerritories;
@@ -131,7 +131,7 @@ void Territory::setConnectedtoTrue(Map* map){
         else{
             map->getTerritories()[edge]->setIsConnected(true);
             connectedTerritories.push(edge);
-        } 
+        }
     }
     while(!connectedTerritories.empty()){
         temp = connectedTerritories.top();
@@ -139,8 +139,8 @@ void Territory::setConnectedtoTrue(Map* map){
         connectedTerritories.pop();
     }
 }
-//Helper method for the validate function of the Class continent, this function set the value of 
-//the isConnected attribute to true for all territories that can be reached stating from 
+//Helper method for the validate function of the Class continent, this function set the value of
+//the isConnected attribute to true for all territories that can be reached stating from
 //the object instance on which it is called onto if it is part of the same continent as iy
 void Territory::setConnectedtoTrue(Map* map,int continentIndex){
     std::stack<int> connectedTerritories;
@@ -156,8 +156,8 @@ void Territory::setConnectedtoTrue(Map* map,int continentIndex){
             }
             else{
                 continue;
-            }           
-        } 
+            }
+        }
     }
     while(!connectedTerritories.empty()){
         temp = connectedTerritories.top();
@@ -166,7 +166,7 @@ void Territory::setConnectedtoTrue(Map* map,int continentIndex){
     }
 }
 
-   
+
 std::string Territory::getName(){
     return this->name;
 }
@@ -201,7 +201,7 @@ std::string Territory::toString(){
 
 
 /*
-Methods for class Map, this is the class responsible to store all the territories. It also act as a control class for them. 
+Methods for class Map, this is the class responsible to store all the territories. It also act as a control class for them.
     std::string author;
     std::string image;
     bool wrap;
@@ -209,7 +209,7 @@ Methods for class Map, this is the class responsible to store all the territorie
     bool warn;
     std::vector<Territory*> territories;
     std::vector<Continent*> continents;
-*/ 
+*/
 
 Map::Map(std::string& tempAuthor,std::string& tempImage, bool tempWrap,std::string& tempScroll, bool tempWarn){
     this->author = tempAuthor;
@@ -224,7 +224,7 @@ Map::~Map(){
         delete i;
     }
     for(Continent* i : this->continents){
-        delete i; 
+        delete i;
     }
     this->territories.clear();
     this->continents.clear();
@@ -302,7 +302,7 @@ int Map::getContinent(std::string continentName){
     throw -2;
 }
 
-//Helper function for the loadMap() function, Since the file only contains the name of the 
+//Helper function for the loadMap() function, Since the file only contains the name of the
 //territories that borders them, this function find the index of each edges and add it to the edges attribute of the territory
 void Map::setTerritoriesEdges(){
     std::vector<int> edgesIndex;
@@ -368,9 +368,9 @@ std::string Map::toString(){
 
 /*
 Methods for class MapLoader, this is the class responsible to load the map at the start of each game.
-It also stores a default map. 
+It also stores a default map.
 std::string defaultMapFile
-*/ 
+*/
 
 MapLoader::MapLoader(){
 
@@ -381,7 +381,7 @@ MapLoader::MapLoader(std::string& mapFile){
 }
 
 MapLoader::~MapLoader(){
-    
+
 };
 
 void MapLoader::setDefaultMapFile(std::string& mapFile){
@@ -425,9 +425,9 @@ bool MapLoader::getline(std::istringstream& ss, std::string& line, char delimite
     //std::cout << line << std::endl;
     return true;
 }
-    
+
 //Take the name of a map file and load all the informations into a map object
-//Throw a negative number if the file is invalid, Posibility of improvement by throwing error messages instead 
+//Throw a negative number if the file is invalid, Posibility of improvement by throwing error messages instead
 Map* MapLoader::loadMap(std::string& mapFile){
     std::ifstream inout(mapFile);
 
@@ -449,7 +449,7 @@ Map* MapLoader::loadMap(std::string& mapFile){
     if(!(this->getline(inout,line))){
         throw -322;
     }
-    
+
     toCompare = "[Continents]";
     if(line.compare(toCompare) != 0){
         throw -33;
@@ -484,7 +484,7 @@ Map* MapLoader::loadMap(std::ifstream& inout){
 
     //Load the author name
     author = this->getValue(inout,"author");
-    
+
     //load the image file name
     image = this->getValue(inout,"image");
 
@@ -585,7 +585,7 @@ void MapLoader::loadTerritories(std::ifstream& inout, Map* map){
     int y;
     std::string continentName;
     std::istringstream ss;
-        
+
     while(this->getline(inout,line)){
         if(line.empty()){
             continue;
@@ -609,7 +609,7 @@ void MapLoader::loadTerritories(std::ifstream& inout, Map* map){
         y = stoi(yString);
         Territory* territory = new Territory(name,x,y,continent);
         while(this->getline(ss,temp,delimiter)){
-            territory->addEgdesNames(temp);
+            territory->addEdgesNames(temp);
         }
         if(!(ss.eof())){
             throw -74;
