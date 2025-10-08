@@ -10,16 +10,19 @@ class Hand;          // from Card.h (teammate)
 class OrdersList;    // defined in our Orders.{h,cpp}
 class Order;
 
+/*Class player represents a player in the game
+A player owns a set of territories, holds a hand of cards,
+maintains a list of Orders, and can issue orders*/
 class Player {
 public:
-    Player();                                // default
+    Player();                                // default constuctor ( create generic player
     explicit Player(const std::string& name);
-    Player(const Player& other);             // copy ctor
-    ~Player();                               // dtor
-    Player& operator=(const Player& other);  // copy assign
+    Player(const Player& other);             // copy constructor(deep copies another player)
+    ~Player();                               // destructor (release dynamic memory)
+    Player& operator=(const Player& other);  // copy assignment operator
 
-    const std::string& getName() const;
-
+    const std::string& getName() const; // return player name 
+// returns list of territories owned and to attack
     std::vector<Territory*> toDefend() const;
     std::vector<Territory*> toAttack() const;
     void issueOrder();                       // creates an Order and adds to list
@@ -29,15 +32,16 @@ public:
     void setHand(Hand* h);                   // takes ownership of Hand*
     OrdersList* getOrders() const;           // non-owning access
 
-    // Pretty print
-    friend std::ostream& operator<<(std::ostream& os, const Player& p);
+    // Stream operator
+    friend std::ostream& operator<<(std::ostream& os, const Player& p); // prints player summary(name territory, hand size,order count)
 
 private:
     // Per assignment: user-defined members as pointer types
-    std::string* name_;
+    std::string* name_;   
     std::vector<Territory*>* terrs_;
     Hand*        hand_;
     OrdersList*  orders_;
 
-    void deepCopyFrom(const Player& other);
+// Internal helper
+    void deepCopyFrom(const Player& other); // deep copy used in copy constructor
 };
