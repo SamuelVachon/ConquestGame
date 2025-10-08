@@ -22,6 +22,7 @@ class Continent{
     public:
 
     Continent(std::string& tempName, int tempNumber);
+    Continent(Continent* continent);
     ~Continent();
     void setName(std::string& name);
     void setNumber(int number);
@@ -34,11 +35,13 @@ class Continent{
     int getNumber();
     std::vector<int> getTerritories();
 
-    std::string toString();
+    friend std::ostream& operator>>(std::ostream& os, const Continent& c);
+
+    std::string name;
 
     private:
 
-    std::string name;
+
     int number;
     std::vector<int> territoriesIndex;
 };
@@ -47,6 +50,7 @@ class Territory{
     public:
 
     Territory(std::string& tempName, int tempx, int tempy, int tempContinent);
+    Territory(Territory* territory);
     ~Territory();
     void setName(std::string& name);
     void setX(int x);
@@ -55,7 +59,7 @@ class Territory{
     void setArmy(int army);
     void setPlayer(Player* player);
     void addEdges(int i);
-    void addEdgesNames(std::string& name);
+    void addEgdesNames(std::string& name);
     void setConnectedtoTrue(Map* map);
     void setConnectedtoTrue(Map* map, int continentIndex);
 
@@ -70,8 +74,8 @@ class Territory{
     int getArmy();
     Player* getPlayer();
 
-    std::string toString();
-
+    friend std::ostream& operator>>(std::ostream& os,const Territory& t);
+    
 
 
     private:
@@ -86,7 +90,7 @@ class Territory{
     int continent;
     Player* player;
     std::vector<std::string> edgesNames;
-
+    
 };
 
 
@@ -94,6 +98,7 @@ class Map{
     public:
 
     Map(std::string& tempAuthor,std::string& tempImage, bool tempWrap,std::string& tempScroll, bool tempWarn);
+    Map(Map* map);
     ~Map();
     void setAuthor(std::string& author);
     void setImage(std::string& image);
@@ -117,7 +122,7 @@ class Map{
 
     bool validate();
 
-    std::string toString();
+    friend std::ostream& operator>>(std::ostream& os,const Map& m);
 
     private:
 
