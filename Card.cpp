@@ -150,8 +150,26 @@ int Hand::size() const{
 }
 
 void Hand::showCards(){
+    vector<int> cardTypeSize(5,0);
+
     for(Card* c : handCards){
-        cout << "Hand shows his card: " << c->getTypeAsString() << endl;
+        //enums can be cast into ints and vice versa
+        cardTypeSize[static_cast<int>(c->getType())]++; //first find quantity of each card type
+    }
+
+    string value;
+    for(int i=0;i<cardTypeSize.size();i++){
+        //map numbers to bombs
+        switch (i) {
+            case 0 : value = "Bomb"; break;
+            case 1 : value = "Reinforcement"; break;
+            case 2 : value = "Blockade"; break;
+            case 3 : value = "Airlift"; break;
+            case 4 : value = "Diplomacy"; break;
+            default : value = "Unknown"; break;
+        }
+
+        cout << "Hand contains: " << cardTypeSize[i] << "x" << value << endl;
     }
 }
 

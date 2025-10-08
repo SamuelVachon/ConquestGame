@@ -1,7 +1,7 @@
 // Header Guards
 #ifndef ORDERS_H
 #define ORDERS_H
- 
+
 #include <string>
 #include <iostream>
 using namespace std;
@@ -9,16 +9,18 @@ using namespace std;
 class Player;   // Forward declaration of Player class
 class Territory;   // Forward declaration of Territory class
 
+void testOrdersLists();
+
 class Order{
 
     private:
-    
+
     // Attributes
     string* description;
     string* effect;
     Player* issuer;
     Territory* target;
-    
+
     public:
 
     // Getters
@@ -26,7 +28,7 @@ class Order{
     string getEffect() const;
     Player* getIssuer() const;
     Territory* getTarget() const;
-    
+
     // Setters
     void setDescription(const string& description);
     void setEffect(const string& effect);
@@ -54,12 +56,12 @@ class Order{
     // Operator
     friend ostream& operator <<(ostream& os, const Order& order);
 
-    
+
 };
 
 // subclass
 class DeployOrder:  public Order{
-    
+
     // Attributes
     private:
     int* numArmies;
@@ -86,8 +88,8 @@ class DeployOrder:  public Order{
 
     // Destructor
     ~DeployOrder() override;
-    
-    //  Core Methods 
+
+    //  Core Methods
     bool validate() override;
     void execute() override;
 
@@ -151,7 +153,7 @@ class AdvanceOrder: public Order{
 class BombOrder: public Order{
 
     public:
-    
+
     // Default Constructor
     BombOrder();
 
@@ -167,7 +169,7 @@ class BombOrder: public Order{
     // Destructor
     ~BombOrder() override;
 
-    //  Core Methods 
+    //  Core Methods
     bool validate() override;
     void execute() override;
 
@@ -182,7 +184,7 @@ class BombOrder: public Order{
 
 class BlockadeOrder : public Order {
 public:
-    //  Constructors 
+    //  Constructors
     BlockadeOrder();
     BlockadeOrder(Player* issuer, Territory* target);
     BlockadeOrder(const BlockadeOrder& other);
@@ -190,8 +192,8 @@ public:
     ~BlockadeOrder() override;
 
     // Overridden methods
-    bool validate() override;   
-    void execute() override;    
+    bool validate() override;
+    void execute() override;
 
     //  Stream insertion operator
     friend ostream& operator<<(ostream& os, const BlockadeOrder& order);
@@ -204,7 +206,7 @@ private:
     int* numArmies;     // armies to move
 
 public:
-    //  Constructors 
+    //  Constructors
     AirliftOrder();
     AirliftOrder(Player* issuer, Territory* source, Territory* target, int numArmies);
     AirliftOrder(const AirliftOrder& other);
@@ -217,9 +219,9 @@ public:
     void setSource(Territory* source);
     void setNumArmies(int numArmies);
 
-    //  Overridden methods 
-    bool validate() override;   
-    void execute() override;  
+    //  Overridden methods
+    bool validate() override;
+    void execute() override;
 
     // Stream insertion operator
     friend ostream& operator<<(ostream& os, const AirliftOrder& order);
@@ -232,22 +234,22 @@ private:
     Player* otherPlayer;   // the second player in the negotiation
 
 public:
-    //  Constructors 
+    //  Constructors
     NegotiateOrder();
     NegotiateOrder(Player* issuer, Player* otherPlayer);
     NegotiateOrder(const NegotiateOrder& other);
     NegotiateOrder& operator=(const NegotiateOrder& other);
     ~NegotiateOrder() override;
 
-    // Getters & Setters 
+    // Getters & Setters
     Player* getOtherPlayer() const;
     void setOtherPlayer(Player* otherPlayer);
 
-    //  Overridden methods 
-    bool validate() override;   
-    void execute() override;    
+    //  Overridden methods
+    bool validate() override;
+    void execute() override;
 
-    //  Stream insertion operator 
+    //  Stream insertion operator
     friend ostream& operator<<(ostream& os, const NegotiateOrder& order);
 };
 
@@ -267,8 +269,8 @@ class OrdersList{
     OrdersList& operator=(const OrdersList& other);
     ~OrdersList();
 
-    
-    //  List Operations 
+
+    //  List Operations
 
     Order* getOrder(int index) const;   // Returns an order by index
     int size() const;                   // Returns number of orders

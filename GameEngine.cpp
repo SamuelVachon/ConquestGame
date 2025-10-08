@@ -212,10 +212,17 @@ bool GameEngine::cmd_loadmap(const std::string& filename) {
 
     // MapLoader loads a file and returns a Map*
     std::string f = filename;
-    Map* m = mapLoader_->loadMap(f);
+    Map* m;
+    try{
+        m = mapLoader_->loadMap(f);
+    }catch(int i){
+        std::cout << i;
+        std::cout << "The file is not valid" << std::endl;
+        return false;
+    }
 
-    if (!m) {
-        std::cout << "Failed to load map.\n";
+    if (!m->validate()) {
+        std::cout << "The map is not valid, try again.\n" << std::endl;
         return false;
     }
 

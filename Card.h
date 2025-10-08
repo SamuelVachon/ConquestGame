@@ -9,6 +9,8 @@ class Player;
 class Deck;
 class Hand;
 
+void testCards();
+
 enum class CardType{
     Bomb,
     Reinforcement,

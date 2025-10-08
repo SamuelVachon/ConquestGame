@@ -7,8 +7,3 @@ void testGameStates() {
     std::cout << engine << "\n";
     engine.runConsole();
 }
-
-int main() {
-    testGameStates();
-    return 0;
-}
