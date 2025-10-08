@@ -16,6 +16,12 @@ Continent::~Continent(){
     this->territoriesIndex.clear();
 };
 
+Continent::Continent(Continent* continent){
+    this->name = continent->name;
+    this->number = continent->number;
+    this->territoriesIndex = continent->territoriesIndex;
+}
+
 void Continent::setName(std::string& name){
     this->name=name;
 }
@@ -61,8 +67,9 @@ std::vector<int> Continent::getTerritories(){
     return this->territoriesIndex;
 }
 
-std::string Continent::toString(){
-    return "";
+std::ostream& operator<<(std::ostream& os, const Continent& c){
+    os << c.name;
+    return os;
 }
 
 
@@ -87,6 +94,17 @@ Territory::Territory(std::string& tempName, int tempx, int tempy, int tempContin
     this->army = 0;
     this->continent = tempContinent;
 };
+
+Territory::Territory(Territory* territory){
+    this->name = territory->name;
+    this->x = territory->x;
+    this->y = territory->y;
+    this->isConnected = territory->isConnected;
+    this->army = territory->army;
+    this->continentIndex = territory->continentIndex;
+    this->edgesIndex = territory->edgesIndex;
+    this->player = territory->player;
+}
 
 Territory::~Territory(){
     this->edgesIndex.clear();
@@ -195,8 +213,9 @@ Player* Territory::getPlayer(){
     return this->player;
 }
 
-std::string Territory::toString(){
-    return "";
+std::ostream& operator>>(std::ostream& os,const Territory& t){
+    os << t.name << "Armies: "<< t.army <<"Coordinates: [" << t.x << "," << t.y << "]";
+    return os;
 }
 
 
@@ -217,6 +236,20 @@ Map::Map(std::string& tempAuthor,std::string& tempImage, bool tempWrap,std::stri
     this->wrap = tempWrap;
     this->scroll = tempScroll;
     this->warn = tempWarn;
+}
+
+Map::Map(Map* map){
+    this->author = map->author;
+    this->image = map->image;
+    this->wrap = map->wrap;
+    this->scroll = map->scroll;
+    this->warn = map->warn;
+    for(Territory* terr : map->territories){
+        this->addTerritory(new Territory(terr));
+    }
+    for(Continent* cont : map->continents){
+        this->addContinents(new Continent(cont));
+    }
 }
 
 Map::~Map(){
@@ -361,8 +394,17 @@ bool Map::validate(){
     return true;
 }
 
-std::string Map::toString(){
-    return "";
+std::ostream& operator>>(std::ostream& os,const Map& m){
+    os << "Author: " << m.author << "\n\n";
+    os << "Continents:\n";
+    for (Continent* cont : m.continents){
+        os << cont << "\n";
+    }
+    os << "\nTerritories:\n";
+    for(Territory* terr : m.territories){
+        os << terr << "\n";
+    }
+    return os;
 }
 
 
