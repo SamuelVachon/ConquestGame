@@ -27,14 +27,3 @@ std::vector<Map*> testLoadMaps(std::vector<std::string> mapNames){
     delete mapLoader;
     return maps;
 }
-
-int main(){
-
-    std::vector<std::string> mapNames = {"./Maps/Earth.map", "./Maps/World.map", "Maps/InvalidMap.map", "Maps/InvalidMapSubGraph.map", "Maps/UncompatibleMap.map", "Maps/UncompatibleMap.txt"};
-    std::vector<Map*> maps = testLoadMaps(mapNames);
-
-    for(Map* map : maps){
-        delete map;
-    }
-    return 0;
-}

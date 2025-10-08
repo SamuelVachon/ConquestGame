@@ -15,6 +15,8 @@ class Player;
 class Territory;
 class Map;
 
+std::vector<Map*> testLoadMaps(std::vector<std::string> mapNames);
+
 class Continent{
 
     public:
@@ -69,7 +71,7 @@ class Territory{
     Player* getPlayer();
 
     std::string toString();
-    
+
 
 
     private:
@@ -84,7 +86,7 @@ class Territory{
     int continent;
     Player* player;
     std::vector<std::string> edgesNames;
-    
+
 };
 
 
@@ -138,10 +140,10 @@ class MapLoader{
     std::string getDefaultMapFile();
     Map* loadMap();
     Map* loadMap(std::string& mapFile);
-    
+
 
     private:
-  
+
     bool getline(std::ifstream& inout, std::string& line);
     bool getline(std::istringstream& ss, std::string& line, char delimiter);
     Map* loadMap(std::ifstream& inout);

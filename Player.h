@@ -1,7 +1,7 @@
-#pragma once      
-//Making sure header file is only included once per complilation unit 
+#pragma once
+//Making sure header file is only included once per complilation unit
 
-#include <iosfwd> 
+#include <iosfwd>
 #include <vector>
 #include <string>
 
@@ -9,6 +9,8 @@ class Territory;     // from Map (forward-declared only)
 class Hand;          // from Card.h (teammate)
 class OrdersList;    // defined in our Orders.{h,cpp}
 class Order;
+
+void testPlayers();
 
 class Player {
 public:

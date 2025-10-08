@@ -16,6 +16,8 @@ class Deck;         // from Cards.h
 class Hand;         // from Cards.h
 class Territory;
 
+void testGameStates();
+
 class GameEngine {
 public:
     enum class State {

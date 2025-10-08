@@ -1,11 +1,11 @@
 #include "Map.h"
 
 /*
-Methods for class Continent, this is a class responsible to keep track which territory are in which continent. 
+Methods for class Continent, this is a class responsible to keep track which territory are in which continent.
 std::string name;
 int number;
 std::vector<int> territoriesIndex; -> represent the index in the map object territories attribute
-*/ 
+*/
 
 Continent::Continent(std::string& tempName, int tempNumber){
     this->name = tempName;
@@ -37,7 +37,7 @@ bool Continent::compare(Continent* continent){
 bool Continent::validate(Map* map, int index){
     int territory = this->territoriesIndex[0];
     map->getTerritories()[territory]->setIsConnected(true);
-    map->getTerritories()[territory]->setConnectedtoTrue(map, index); 
+    map->getTerritories()[territory]->setConnectedtoTrue(map, index);
     for(int terr : this->territoriesIndex){
         if(map->getTerritories()[terr]->getIsConnected()){
             map->getTerritories()[terr]->setIsConnected(false);

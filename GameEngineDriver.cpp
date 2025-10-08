@@ -8,7 +8,7 @@ void testGameStates() {
     engine.runConsole();
 }
 
-int main() {
-    testGameStates();
-    return 0;
-}
+//int main() {
+//    testGameStates();
+//    return 0;
+//}
