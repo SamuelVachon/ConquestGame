@@ -213,8 +213,8 @@ Player* Territory::getPlayer(){
     return this->player;
 }
 
-std::ostream& operator>>(std::ostream& os,const Territory& t){
-    os << t.name << "Armies: "<< t.army <<"Coordinates: [" << t.x << "," << t.y << "]";
+std::ostream& operator<<(std::ostream& os,const Territory& t){
+    os << t.name << " Armies: "<< t.army <<" Coordinates: [" << t.x << "," << t.y << "]";
     return os;
 }
 
@@ -394,15 +394,15 @@ bool Map::validate(){
     return true;
 }
 
-std::ostream& operator>>(std::ostream& os,const Map& m){
+std::ostream& operator<<(std::ostream& os,const Map& m){
     os << "Author: " << m.author << "\n\n";
     os << "Continents:\n";
     for (Continent* cont : m.continents){
-        os << cont << "\n";
+        os << *cont << "\n";
     }
     os << "\nTerritories:\n";
     for(Territory* terr : m.territories){
-        os << terr << "\n";
+        os << *terr << "\n";
     }
     return os;
 }

@@ -22,10 +22,15 @@ void testOrdersLists() {
     string t3Name = "Manitoba";
     string t4Name = "Alberta";
 
+  
+
     Territory* t1 = new Territory(t1Name, 0, 0, 1);
     Territory* t2 = new Territory(t2Name, 0, 0, 1);
     Territory* t3 = new Territory(t3Name, 0, 0, 1);
     Territory* t4 = new Territory(t4Name, 0, 0, 1);
+
+
+
 
     // Assign ownership
     t1->setPlayer(alice);
