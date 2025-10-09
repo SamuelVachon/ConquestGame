@@ -35,7 +35,7 @@ class Continent{
     int getNumber();
     std::vector<int> getTerritories();
 
-    friend std::ostream& operator>>(std::ostream& os, const Continent& c);
+    friend std::ostream& operator<<(std::ostream& os, const Continent& c);
 
     std::string name;
 
@@ -59,7 +59,7 @@ class Territory{
     void setArmy(int army);
     void setPlayer(Player* player);
     void addEdges(int i);
-    void addEgdesNames(std::string& name);
+    void addEdgesNames(std::string& name);
     void setConnectedtoTrue(Map* map);
     void setConnectedtoTrue(Map* map, int continentIndex);
 
@@ -74,7 +74,7 @@ class Territory{
     int getArmy();
     Player* getPlayer();
 
-    friend std::ostream& operator>>(std::ostream& os,const Territory& t);
+    friend std::ostream& operator<<(std::ostream& os,const Territory& t);
     
 
 
@@ -122,7 +122,7 @@ class Map{
 
     bool validate();
 
-    friend std::ostream& operator>>(std::ostream& os,const Map& m);
+    friend std::ostream& operator<<(std::ostream& os,const Map& m);
 
     private:
 

@@ -24,6 +24,8 @@ std::vector<Map*> testLoadMaps(std::vector<std::string> mapNames){
             std::cerr << "Error: " << e.what() << std::endl;
         }
     }
+    std::cout << *(maps[0]) << std::endl;
+    std::cout << *(maps[1]) << std::endl;
     delete mapLoader;
     return maps;
 }

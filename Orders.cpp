@@ -351,7 +351,7 @@ bool AdvanceOrder::validate() {
         return false;
     }
 
-    if (source == nullptr || getTarget() == nullptr) {
+    if (getSource() == nullptr || getTarget() == nullptr) {
         cout << "Invalid: Missing source or target territory.\n";
         return false;
     }
@@ -362,7 +362,7 @@ bool AdvanceOrder::validate() {
     }
 
     Player* issuer = getIssuer();
-    Territory* src = source;
+    Territory* src = getSource();
     Territory* tgt = getTarget();
 
     // Check that player owns source
@@ -418,7 +418,7 @@ void AdvanceOrder::execute() {
     }
 
     Player* issuer = getIssuer();
-    Territory* src = source;
+    Territory* src = getSource();
     Territory* tgt = getTarget();
     int movingArmies = *numArmies;
 
