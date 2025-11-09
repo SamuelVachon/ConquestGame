@@ -11,14 +11,16 @@ Player::Player()
 : name_(new std::string("Player")),
   terrs_(new std::vector<Territory*>()),
   hand_(new Hand()),
-  orders_(new OrdersList()) {}
+  orders_(new OrdersList()),
+  reinforcemtnts_(50) {}
 
 //Parametrized constructor: Creates a player with a custom name but otherwise identical to the default constructor 
 Player::Player(const std::string& name)
 : name_(new std::string(name)),
   terrs_(new std::vector<Territory*>()),
   hand_(new Hand()),
-  orders_(new OrdersList()) {}
+  orders_(new OrdersList()),
+  reinforcemtnts_(50) {}
 
 /*Copy constructor: Initializes all pointer to nullptr, uses deepCopyForm to make a deep copy of 
 another Player object (New dynamic memory allocation) */
@@ -110,4 +112,5 @@ void Player::deepCopyFrom(const Player& other) {
     // We own Hand and OrdersList → deep-copy them
     hand_  = new Hand(*other.hand_);
     orders_= new OrdersList(*other.orders_);
+    reinforcemtnts_ = other.reinforcemtnts_;
 }

@@ -64,6 +64,7 @@ private:
     bool cmd_validatemap();
     bool cmd_addplayer(const std::string& name);
     bool cmd_assigncountries();
+    bool cmd_gamestart();
     bool cmd_issueorder();           // ask each player to issue a dummy order
     bool cmd_endissueorders();       // transition to ExecuteOrders
     bool cmd_executeorders();        // execute all players’ orders (demo)
@@ -81,6 +82,9 @@ private:
 
     // Round-robin assignment
     void assignTerritoriesRoundRobin();
+
+    //StartUpPhase method
+    void startupPhase();
 };
 
 // keep the declaration visible to users of the header

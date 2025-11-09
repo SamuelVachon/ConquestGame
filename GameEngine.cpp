@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <bits/stdc++.h>
 
 // Include other team parts so GameEngine can use them
 #include "Map.h"
@@ -158,7 +159,7 @@ bool GameEngine::handleCommand(const std::string& cmd, const std::string& arg) {
             break;
 
         case State::MapValidated:
-            if (cmd == "addplayer")   return cmd_addplayer(arg);
+            if (cmd == "addplayer")  return cmd_addplayer(arg);
             if (cmd == "loadmap")     return cmd_loadmap(arg);
             break;
 
@@ -168,9 +169,8 @@ bool GameEngine::handleCommand(const std::string& cmd, const std::string& arg) {
             break;
 
         case State::AssignCountries:
-            if (cmd == "issueorder" || cmd == "issueorders") {
-                *state_ = State::IssueOrders;
-                return true;
+            if (cmd == "gamestart") {
+                return cmd_gamestart();
             }
             break;
 
@@ -257,7 +257,19 @@ bool GameEngine::cmd_addplayer(const std::string& name) {
 
     // Player has constructor Player(string name)
     players_->push_back(new Player(name));
-    *state_ = State::PlayersAdded;
+
+    if (players_->size() == 2){
+        *state_ = State::PlayersAdded;
+    }
+    if(players_->size() ==6){
+        std::cout << "Maximum number of players reached (6). Please proceed to assign countries.\n";
+    }
+    if (players_->size() > 6){
+        std::cout << "Maximum number of players reached (6).\n";
+        players_->pop_back(); // remove last added player
+        return false;
+    }
+
     std::cout << "Player '" << name << "' added.\n";
     return true;
 }
@@ -277,6 +289,30 @@ bool GameEngine::cmd_assigncountries() {
     *countriesAssigned_ = true;
     *state_ = State::AssignCountries;
     std::cout << "Territories assigned in round-robin.\n";
+    return true;
+}
+
+bool GameEngine::cmd_gamestart() {
+    if (!*countriesAssigned_) {
+        std::cout << "You must assign countries first.\n";
+        return false;
+    }
+    
+    deck_ = new Deck(52); // create a new deck for the game
+
+    for (auto* p : *players_) {
+        Hand* hand = new Hand();
+        hand->addCard(deck_->draw());
+        hand->addCard(deck_->draw());
+        p->setHand(hand);      
+    }
+
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(players_->begin(), players_->end(), g);
+
+    *state_ = State::IssueOrders;
+    std::cout << "Game started! Moving to Issue Orders phase.\n";
     return true;
 }
 
@@ -356,14 +392,59 @@ void GameEngine::resetMapAndCountries() {
 }
 
 void GameEngine::assignTerritoriesRoundRobin() {
-    // Simple algorithm: assign each territory to a player in sequence.
+    // Algorythm that assigne player a contigous set of territory
     auto territories = map_->getTerritories(); // vector<Territory*>
     if (territories.empty()) return;
 
-    size_t idx = 0;
-    for (auto* t : territories) {
-        Player* owner = players_->at(idx % players_->size());
-        owner->addTerritory(t);
-        ++idx;
+    size_t idxT =0;
+    size_t nTerritories = territories.size();
+    size_t nPlayers = players_->size();
+    Territory* t = territories[0];
+    Territory* temp;
+    std::vector<Player*> players = *players_;
+    bool assigned = false;
+
+    players[0]->addTerritory(t); // first territory to first player
+    Territory* toAdd = territories[t->getEdges()[idxT++]];
+
+    for (auto* p : players) {
+        while(p->toDefend().size() < (nTerritories / nPlayers) && !assigned){  
+            if(idxT >= t->getEdges().size()){
+                t = toAdd;
+                idxT=0;
+            }
+            temp = territories[t->getEdges()[idxT++]];
+            if(temp->getPlayer() == nullptr){
+                p->addTerritory(toAdd);
+                toAdd = temp;
+            }
+            for(auto* terr : territories){
+                if(terr->getPlayer() == nullptr){
+                    assigned = false;
+                    continue;
+                }
+                assigned = true;
+            }
+        }
     }
+}
+
+void GameEngine::startupPhase() {
+    std::cout << "=== Warzone Game Engine ===\n";
+    std::cout << "Commands: loadmap <file>, validatemap, addplayer <name>,\n"
+                 "assigncountries, gamestart,  issueorder, endissueorders, executeorders,\n"
+                 "endexecorders, play, win, end\n";
+    std::cout << "---------------------------------------------\n";
+
+    std::string line;
+    while (*state_ != State::IssueOrders) {
+        std::string cmd, arg, line;
+        std::cout << ">";
+        std::getline(std::cin, line);
+        std::istringstream iss(line);
+        std::getline(iss, cmd, ' ');
+        std::getline(iss, arg);
+        this->handleCommand(cmd, arg); 
+    }
+    
 }

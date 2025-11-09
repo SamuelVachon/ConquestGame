@@ -93,6 +93,7 @@ Territory::Territory(std::string& tempName, int tempx, int tempy, int tempContin
     this->isConnected = false;
     this->army = 0;
     this->continent = tempContinent;
+    this->player = nullptr;
 };
 
 Territory::Territory(Territory* territory){
