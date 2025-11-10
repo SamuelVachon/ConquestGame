@@ -111,3 +111,53 @@ void Player::deepCopyFrom(const Player& other) {
     hand_  = new Hand(*other.hand_);
     orders_= new OrdersList(*other.orders_);
 }
+
+// ====== A2 Part 4 Additions ======
+
+Hand* Player::getHand() const {
+    return hand_;
+}
+
+// Reinforcement pool
+void Player::addReinforcements(int n) {
+    reinforce_ += n;
+}
+
+bool Player::spendReinforcements(int n) {
+    if (n <= reinforce_) {
+        reinforce_ -= n;
+        return true;
+    }
+    return false;
+}
+
+int Player::reinforcementPool() const {
+    return reinforce_;
+}
+
+// Turn/conquest flags
+void Player::markConquered() {
+    conqueredThisTurn_ = true;
+}
+
+bool Player::conqueredThisTurn() const {
+    return conqueredThisTurn_;
+}
+
+void Player::resetTurnFlags() {
+    conqueredThisTurn_ = false;
+    negotiated_.clear();
+}
+
+// Negotiation (truce)
+void Player::addTruceWith(Player* p) {
+    if (p && p != this)
+        negotiated_.push_back(p);
+}
+
+bool Player::hasTruceWith(Player* p) const {
+    for (auto* q : negotiated_) {
+        if (q == p) return true;
+    }
+    return false;
+}
