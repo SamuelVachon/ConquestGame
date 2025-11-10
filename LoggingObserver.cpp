@@ -43,7 +43,7 @@ LogObserver::LogObserver() {}
 LogObserver::~LogObserver() {}
 
 void LogObserver::update(Subject* s) {
-    // subject should also be ILoggable per A2 Part 5
+    // Subject should be ILoggable 
     auto* loggable = dynamic_cast<ILoggable*>(s);
     if (!loggable) return;
 
@@ -52,3 +52,4 @@ void LogObserver::update(Subject* s) {
 
     out << loggable->stringToLog() << "\n";
 }
+
