@@ -20,14 +20,12 @@ GameEngine::GameEngine()
   players_(new std::vector<Player*>()),
   deck_(nullptr),
   countriesAssigned_(new bool(false)) {
-    // Starts the game in "start" state
     std::cout << "GameEngine created (state = start)\n";
 }
 
 GameEngine::GameEngine(const GameEngine& other)
 : state_(nullptr), mapLoader_(nullptr), map_(nullptr), players_(nullptr),
   deck_(nullptr), countriesAssigned_(nullptr) {
-    // Copy constructor (deep copy)
     deepCopyFrom(other);
 }
 
@@ -49,7 +47,6 @@ GameEngine::~GameEngine() {
 // ============================
 
 void GameEngine::deepCopyFrom(const GameEngine& other) {
-    // Makes a deep copy of another GameEngine
     state_ = new State(*other.state_);
     mapLoader_ = new MapLoader(*other.mapLoader_);
     map_ = nullptr;  // We don't clone the map itself
@@ -62,7 +59,6 @@ void GameEngine::deepCopyFrom(const GameEngine& other) {
 }
 
 void GameEngine::clearAll() {
-    // Always clean up memory manually (since all members are pointers)
     if (players_) {
         for (auto* p : *players_) delete p;
         delete players_;
@@ -88,7 +84,6 @@ void GameEngine::clearAll() {
 GameEngine::State GameEngine::getState() const { return *state_; }
 
 std::string GameEngine::stateName() const {
-    // Converts enum state → readable string
     switch (*state_) {
         case State::Start:            return "start";
         case State::MapLoaded:        return "maploaded";
@@ -103,8 +98,20 @@ std::string GameEngine::stateName() const {
     return "unknown";
 }
 
+// Centralize all state updates here so we also log via notify()
+void GameEngine::transition(State newState) {
+    *state_ = newState;
+    notify();                 // <-- LogObserver::update(...)
+}
+
+// What the logger writes after each transition()
+std::string GameEngine::stringToLog() const {
+    std::ostringstream os;
+    os << "[GameEngine] state -> " << stateName();
+    return os.str();
+}
+
 std::ostream& operator<<(std::ostream& os, const GameEngine& ge) {
-    // Used for printing the GameEngine state
     os << "[GameEngine state=" << ge.stateName()
        << " players=" << (ge.players_ ? ge.players_->size() : 0)
        << "]";
@@ -130,7 +137,6 @@ void GameEngine::runConsole() {
         std::getline(iss, arg);
         if (!arg.empty() && arg.front() == ' ') arg.erase(arg.begin());
 
-        // This function processes the command based on current state
         bool ok = handleCommand(cmd, arg);
         std::cout << (ok ? "[OK] " : "[ERROR] ")
                   << "New state → " << stateName() << "\n";
@@ -144,9 +150,6 @@ void GameEngine::runConsole() {
 // ============================
 
 bool GameEngine::handleCommand(const std::string& cmd, const std::string& arg) {
-    // This is a “state machine”: only certain commands work per state.
-    // If a command doesn’t make sense (ex: trying to add a player before loading a map), reject it.
-
     switch (*state_) {
         case State::Start:
             if (cmd == "loadmap") return cmd_loadmap(arg);
@@ -169,7 +172,7 @@ bool GameEngine::handleCommand(const std::string& cmd, const std::string& arg) {
 
         case State::AssignCountries:
             if (cmd == "issueorder" || cmd == "issueorders") {
-                *state_ = State::IssueOrders;
+                transition(State::IssueOrders);
                 return true;
             }
             break;
@@ -187,7 +190,7 @@ bool GameEngine::handleCommand(const std::string& cmd, const std::string& arg) {
 
         case State::Win:
             if (cmd == "end") return cmd_end();
-            if (cmd == "play") { *state_ = State::IssueOrders; return true; }
+            if (cmd == "play") { transition(State::IssueOrders); return true; }
             break;
 
         case State::End:
@@ -208,15 +211,13 @@ bool GameEngine::cmd_loadmap(const std::string& filename) {
         return false;
     }
 
-    resetMapAndCountries(); // delete old map if any
+    resetMapAndCountries();
 
-    // MapLoader loads a file and returns a Map*
     std::string f = filename;
     Map* m;
-    try{
+    try {
         m = mapLoader_->loadMap(f);
-    }catch(int i){
-        std::cout << i;
+    } catch (int) {
         std::cout << "The file is not valid" << std::endl;
         return false;
     }
@@ -227,7 +228,7 @@ bool GameEngine::cmd_loadmap(const std::string& filename) {
     }
 
     map_ = m;
-    *state_ = State::MapLoaded;
+    transition(State::MapLoaded);               // <-- was *state_ = ...
     std::cout << "Map successfully loaded.\n";
     return true;
 }
@@ -238,9 +239,8 @@ bool GameEngine::cmd_validatemap() {
         return false;
     }
 
-    // Map::validate() checks graph structure & continent rules
     if (map_->validate()) {
-        *state_ = State::MapValidated;
+        transition(State::MapValidated);        // <-- was *state_ = ...
         std::cout << "Map validated successfully.\n";
         return true;
     } else {
@@ -255,9 +255,8 @@ bool GameEngine::cmd_addplayer(const std::string& name) {
         return false;
     }
 
-    // Player has constructor Player(string name)
     players_->push_back(new Player(name));
-    *state_ = State::PlayersAdded;
+    transition(State::PlayersAdded);            // <-- was *state_ = ...
     std::cout << "Player '" << name << "' added.\n";
     return true;
 }
@@ -273,9 +272,9 @@ bool GameEngine::cmd_assigncountries() {
         return false;
     }
 
-    assignTerritoriesRoundRobin(); // evenly distributes territories
+    assignTerritoriesRoundRobin();
     *countriesAssigned_ = true;
-    *state_ = State::AssignCountries;
+    transition(State::AssignCountries);         // <-- was *state_ = ...
     std::cout << "Territories assigned in round-robin.\n";
     return true;
 }
@@ -286,18 +285,17 @@ bool GameEngine::cmd_issueorder() {
         return false;
     }
 
-    // Ask each player to issue a dummy order
     for (auto* p : *players_) {
         p->issueOrder();
     }
 
-    *state_ = State::IssueOrders;
+    transition(State::IssueOrders);             // <-- was *state_ = ...
     std::cout << "Each player issued one order.\n";
     return true;
 }
 
 bool GameEngine::cmd_endissueorders() {
-    *state_ = State::ExecuteOrders;
+    transition(State::ExecuteOrders);           // <-- was *state_ = ...
     std::cout << "Moving to Execute Orders phase.\n";
     return true;
 }
@@ -312,35 +310,35 @@ bool GameEngine::cmd_executeorders() {
         int n = ol->size();
         for (int i = 0; i < n; ++i) {
             auto* o = ol->getOrder(i);
-            if (o) o->execute(); // just prints effects for now
+            if (o) o->execute();
         }
     }
 
-    *state_ = State::ExecuteOrders;
+    transition(State::ExecuteOrders);           // <-- keep phase consistent & logged
     std::cout << "All orders executed.\n";
     return true;
 }
 
 bool GameEngine::cmd_endexecorders() {
-    // This doesn’t end the game; players can go back to play
+    // Doesn’t end game; players can go back to play
     std::cout << "End of execution phase. Type 'play' to continue or 'win' if game is over.\n";
     return true;
 }
 
 bool GameEngine::cmd_play() {
-    *state_ = State::IssueOrders;
+    transition(State::IssueOrders);             // <-- was *state_ = ...
     std::cout << "Back to issuing orders.\n";
     return true;
 }
 
 bool GameEngine::cmd_win() {
-    *state_ = State::Win;
+    transition(State::Win);                     // <-- was *state_ = ...
     std::cout << "A player has won! 🎉\n";
     return true;
 }
 
 bool GameEngine::cmd_end() {
-    *state_ = State::End;
+    transition(State::End);                     // <-- was *state_ = ...
     std::cout << "Game ended. Goodbye!\n";
     return true;
 }
@@ -356,7 +354,6 @@ void GameEngine::resetMapAndCountries() {
 }
 
 void GameEngine::assignTerritoriesRoundRobin() {
-    // Simple algorithm: assign each territory to a player in sequence.
     auto territories = map_->getTerritories(); // vector<Territory*>
     if (territories.empty()) return;
 
