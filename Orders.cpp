@@ -338,7 +338,7 @@ bool AdvanceOrder::validate() {
     }
 
     // Negotiation rule: cannot attack if players have a truce
-     if (getTarget()->getPlayer() && issuer->hasTruceWith(getTarget()->getPlayer())) {
+     if (getTarget()->getPlayer() && getIssuer()->hasTruceWith(getTarget()->getPlayer())) {
     cout << "Invalid: players are under negotiation (truce)." << endl;
     return false;
     }
