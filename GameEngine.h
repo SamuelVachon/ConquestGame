@@ -4,14 +4,14 @@
 #include <string>
 #include <vector>
 #include <iosfwd>
-#include "LoggingObserver.h"   // <-- NEW: for Subject + ILoggable
+#include "LoggingObserver.h"   // for Subject + ILoggable
 
 class Map;
 class MapLoader;
 class Player;
 class Deck;
 
-class GameEngine : public Subject, public ILoggable {  // <-- NEW: loggable subject
+class GameEngine : public Subject, public ILoggable {  // loggable subject
 public:
     enum class State {
         Start,
@@ -37,8 +37,8 @@ public:
     // ===== State helpers
     State getState() const;
     std::string stateName() const;
-    void transition(State newState);                 // <-- NEW: centralizes state changes & logging
-    std::string stringToLog() const override;        // <-- NEW: what to write to gamelog.txt
+    void transition(State newState);                
+    std::string stringToLog() const override;       
 
     // ===== Commands / FSM
     bool handleCommand(const std::string& cmd, const std::string& arg);
@@ -74,4 +74,5 @@ private:
     void clearAll();
 };
 
-#endif // GAMEENGINE_H
+#endif 
+
