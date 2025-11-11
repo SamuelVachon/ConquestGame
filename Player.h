@@ -8,7 +8,8 @@
 class Territory;     // from Map (forward-declared only)
 class Hand;          // from Card.h (teammate)
 class OrdersList;    // defined in our Orders.{h,cpp}
-class Order;
+class Order;         // defined in our Orders.{h,cpp}
+class Deck;          // from Card.h
 
 void testPlayers();
 
@@ -32,6 +33,16 @@ public:
 
     // Driver helpers
     void addTerritory(Territory* t);         // Player does NOT own Territory*
+    std::vector<Territory*>* getTerritories();
+    void addReinforcements(int number);
+
+    //Related to main game loop
+    void issueOrder(Deck* deck);
+    bool isDoneIssuing() const;
+    bool hasOrders() const;
+    void addOrder(Order* order);
+    Order* nextOrder();
+
     void setHand(Hand* h);                   // takes ownership of Hand*
     OrdersList* getOrders() const;           // non-owning access
 
@@ -64,7 +75,7 @@ private:
     Hand*        hand_;
     OrdersList*  orders_;
     int reinforcemtnts_;
-
+    bool doneIssuing_;
 // Internal helper
     void deepCopyFrom(const Player& other); // deep copy used in copy constructor
     // ====== A2 Part 4 Fields ======
