@@ -1,4 +1,5 @@
 #include "CommandProcessing.h"
+#include "LoggingObserver.h"
 #include <sstream>
 #include <cctype>
 
@@ -15,9 +16,16 @@ Command& Command::operator=(const Command& other) {
 }
 Command::~Command() { delete raw_; delete effect_; }
 
-void Command::saveEffect(const std::string& eff) { *effect_ = eff; }
+void Command::saveEffect(const std::string& eff) {
+    *effect_ = eff;     
+    notify();           // Part 5 addition (assign2)
+}
 const std::string& Command::getRaw() const { return *raw_; }
 const std::string& Command::getEffect() const { return *effect_; }
+
+std::string Command::stringToLog() const {
+    return "Effect:  " + getEffect();
+}
 
 std::ostream& operator<<(std::ostream& os, const Command& c) {
     os << "Command{raw=\"" << *c.raw_ << "\", effect=\"" << *c.effect_ << "\"}";
@@ -136,7 +144,9 @@ std::string CommandProcessor::readCommand() {
 }
 
 
-void CommandProcessor::saveCommand(Command* cmd) { history_->push_back(cmd); }
+void CommandProcessor::saveCommand(Command* cmd) {
+     history_->push_back(cmd); 
+     notify();}
 void CommandProcessor::setState(GameState s) { *state_ = s; }
 
 std::string CommandProcessor::stateToString(GameState s) {
@@ -154,6 +164,10 @@ std::string CommandProcessor::stateToString(GameState s) {
     return "unknown";
 }
 
+std::string CommandProcessor::stringToLog() const {
+    if (history_->empty()) return "No commands";
+    return "Command:  " + history_->back()->getRaw();
+}
 std::ostream& operator<<(std::ostream& os, const CommandProcessor& cp) {
     os << "CommandProcessor{state=" << CommandProcessor::stateToString(*cp.state_) << ", history=[";
     for (size_t i = 0; i < cp.history_->size(); ++i) {
