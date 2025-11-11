@@ -10,6 +10,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include "LoggingObserver.h" 
 
 // Forward declarations
 class Command;
@@ -30,7 +31,7 @@ enum class GameState {
 };
 
 // -------------------- Command --------------------
-class Command {
+class Command : public Subject, public ILoggable{
 public:
     Command();
     explicit Command(const std::string& raw);
@@ -38,6 +39,7 @@ public:
     Command& operator=(const Command& other);
     ~Command();
 
+    std::string stringToLog() const override; 
     void saveEffect(const std::string& eff);
     const std::string& getRaw() const;
     const std::string& getEffect() const;
@@ -50,16 +52,19 @@ private:
 };
 
 // -------------------- CommandProcessor --------------------
-class CommandProcessor {
+class CommandProcessor : public Subject, public ILoggable{
 public:
     CommandProcessor();
     CommandProcessor(const CommandProcessor& other);
     CommandProcessor& operator=(const CommandProcessor& other);
     virtual ~CommandProcessor();
+
     virtual Command* getCommand();
     virtual bool validate(Command* cmd);
     const std::vector<Command*>& history() const;
     GameState getState() const;
+
+    std::string stringToLog() const override;
     static std::string stateToString(GameState s);
     friend std::ostream& operator<<(std::ostream& os, const CommandProcessor& cp);
 
@@ -69,6 +74,7 @@ protected:
     void setState(GameState s);
 
 private:
+      std::string lastRawCommand_;      // Part 5: remember last cmd text
     std::vector<Command*>* history_;
     GameState* state_;
 };
