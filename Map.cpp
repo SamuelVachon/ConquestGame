@@ -106,12 +106,9 @@ Territory::Territory(std::string& tempName, int tempx, int tempy, int tempContin
     this->isConnected = false;
     this->army = 0;
     this->continent = tempContinent;
-<<<<<<< HEAD
     this->player = nullptr;
-=======
     this->continentPtr = nullptr;
     this->adjacentTerritories_ = std::vector<Territory*>();
->>>>>>> 01d3fda (Add modifications to Continent and Territory class to have references to each other, solving issue #27, as well as adjacent territories for Player class to use)
 };
 
 Territory::Territory(Territory* territory){
