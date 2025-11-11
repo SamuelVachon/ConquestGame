@@ -38,7 +38,8 @@ public:
     State getState() const;
     std::string stateName() const;
     void transition(State newState);                
-    std::string stringToLog() const override;       
+    std::string stringToLog() const override; 
+    void startupPhase();      
 
     // ===== Commands / FSM
     bool handleCommand(const std::string& cmd, const std::string& arg);
