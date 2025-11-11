@@ -59,7 +59,6 @@ public:
     bool cmd_end();
 
     //Related to the main game loop
-    void startupPhase();
     void reinforcementPhase();
     void issueOrdersPhase();
     void executeOrdersPhase();
