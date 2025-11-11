@@ -4,10 +4,12 @@
 #include <string>
 #include <vector>
 #include <iosfwd>
+#include <fstream>    // for std::ofstream
+#include <algorithm>  // for std::remove in detach
 
-class Subject;   // forward declare so Observer can say update(Subject*)
+class Subject;   // forward declare
 
-// ILoggable: For classes that want to be logged 
+// ILoggable: classes that can produce a log line
 class ILoggable {
 public:
     virtual ~ILoggable() = default;
@@ -21,7 +23,7 @@ public:
     virtual void update(Subject* s) = 0;
 };
 
-// Subject: keeps a list of observers and notifies them
+// Subject: owns a list of observers and notifies them
 class Subject {
 public:
     Subject();
@@ -32,18 +34,19 @@ public:
     void attach(Observer* o);
     void detach(Observer* o);
 protected:
-    void notify();   // subclasses call this at the exact log points
+    void notify();   // subclasses call this at log points
 private:
     std::vector<Observer*>* observers_; // pointer per A2 rule
 };
 
-// LogObserver: writes to gamelog.txt whenever update() is called
+// LogObserver: appends stringToLog() to gamelog.txt on update
 class LogObserver : public Observer {
 public:
-    LogObserver();
+     LogObserver();
     ~LogObserver() override;
     void update(Subject* s) override; // appends s->stringToLog()
+
+
 };
 
-#endif 
-
+#endif
