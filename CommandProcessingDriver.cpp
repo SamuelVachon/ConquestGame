@@ -2,7 +2,7 @@
 #include <iostream>
 
 /**
- * Simple test driver required in Part 1.
+ *  test driver required.
  * Demonstrates: console path, file path, and invalid commands.
  */
 void testCommandProcessor() {
