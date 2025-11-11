@@ -287,6 +287,8 @@ class OrdersList: public Subject, public ILoggable{
 
     friend ostream& operator<<(ostream& os, const OrdersList& ol);
 
+    private:
+    Order* lastAdded_ = nullptr;   // Track last added
 
 };
 
