@@ -179,7 +179,7 @@ void Hand::showCards(){
     }
 
     string value;
-    for(int i=0;i<cardTypeSize.size();i++){
+    for(int i=0;i<static_cast<int>(cardTypeSize.size());i++){
         //map numbers to bombs
         switch (i) {
             case 0 : value = "Bomb"; break;
