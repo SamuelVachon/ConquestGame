@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 
+extern void testLoggingObserver();    // from LoggingObserverDriver.cpp
+extern void testCommandProcessor();   
 // Run interactive console mode
 static int runConsole() {
     CommandProcessor cp;
@@ -36,10 +38,17 @@ int main(int argc, char** argv) {
             if (argc < 3) { std::cerr << "error: -file requires a filename\n"; return 2; }
             return runFile(argv[2]);
         }
-        if (arg1 == "--test") { testCommandProcessor(); return 0; }
+        if (arg1 == "--test") {
+            
+            testCommandProcessor();
+            testLoggingObserver();   
+           
+            return 0;
+        }
         std::cerr << "usage:\n  a2 -console\n  a2 -file <filename>\n  a2 --test\n";
         return 2;
     }
     testCommandProcessor();
+    testLoggingObserver();          
     return 0;
 }
