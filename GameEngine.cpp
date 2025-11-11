@@ -105,6 +105,17 @@ void GameEngine::transition(State newState) {
     notify();                 // <-- LogObserver::update(...)
 }
 
+//  What gets written to gamelog.txt by LogObserver
+std::string GameEngine::stringToLog() const {
+    return "STATE " + stateName();
+}
+
+// Centralize state changes + notify the observer
+void GameEngine::transition(State newState) {
+    *state_ = newState;
+    notify();   // <- triggers LogObserver to write "STATE <name>"
+}
+
 // What the logger writes after each transition()
 std::string GameEngine::stringToLog() const {
     std::ostringstream os;
