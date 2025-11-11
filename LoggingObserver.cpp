@@ -43,13 +43,13 @@ LogObserver::LogObserver() {}
 LogObserver::~LogObserver() {}
 
 void LogObserver::update(Subject* s) {
-    // Subject should be ILoggable 
-    auto* loggable = dynamic_cast<ILoggable*>(s);
+    const auto* loggable = dynamic_cast<const ILoggable*>(s);
     if (!loggable) return;
 
     std::ofstream out("gamelog.txt", std::ios::app);
     if (!out.is_open()) return;
 
-    out << loggable->stringToLog() << "\n";
+    out << loggable->stringToLog() << '\n';
 }
+
 
