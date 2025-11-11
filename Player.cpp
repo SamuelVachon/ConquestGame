@@ -62,6 +62,7 @@ std::vector<Territory*> Player::toDefend() const {
     return *terrs_;
 }
 
+//Modified for Part 3
 //toAttack(): Retruns the reverse of the owned territories list
 std::vector<Territory*> Player::toAttack() const {
     std::vector<Territory*> targets;
@@ -101,6 +102,9 @@ void Player::addTerritory(Territory* t) {
     t->setPlayer(this);
     if (t) terrs_->push_back(t);
 }
+
+
+// ====== A2 Part 3 Modifications ======
 
 void Player::addReinforcements(int number) { reinforcements_+=number; }
 
