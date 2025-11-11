@@ -1,38 +1,45 @@
+#include "CommandProcessing.h"
 #include <iostream>
-#include <cstdlib>
-#include <vector>
-#include "Player.h"
-#include "Card.h"
-#include "Orders.h"
-#include "GameEngine.h"
-#include "Map.h"
+#include <string>
 
-void test(){
-    cout << "\n|||||||| Running test sequence of all drivers ||||||||" << endl;
-
-    cout << "\n|||||||| MapDriver ||||||||\n\n" << endl;
-    std::vector<std::string> mapNames = {"./Maps/Earth.map", "./Maps/World.map", "Maps/InvalidMap.map", "Maps/InvalidMapSubGraph.map", "Maps/UncompatibleMap.map", "Maps/UncompatibleMap.txt"};
-    std::vector<Map*> maps = testLoadMaps(mapNames);
-
-    for(Map* map : maps){
-        delete map;
+// Run interactive console mode
+static int runConsole() {
+    CommandProcessor cp;
+    std::cout << "[mode] console (type :q to exit)\n";
+    while (true) {
+        Command* c = cp.getCommand();
+        if (!c) break;           
+        std::cout << *c << "\n"; 
+        if (cp.getState() == GameState::ExitProgram) break;
     }
-    cout << "\n|||||||| Player Driver ||||||||\n\n" << endl;
-
-    testPlayers();
-
-    cout << "\n|||||||| OrderDriver ||||||||\n\n" << endl;
-
-    testOrdersLists();
-
-    cout << "\n|||||||| CardDriver ||||||||\n\n" << endl;
-    testCards();
-
-    cout << "\n|||||||| EngineDriver ||||||||\n\n" << endl;
-    testGameStates();
+    return 0;
 }
 
-int main(){
-    test();
+// Run file mode using adapter
+static int runFile(const std::string& path) {
+    FileCommandProcessorAdapter fcp(path);
+    std::cout << "[mode] file: " << path << "\n";
+    while (true) {
+        Command* c = fcp.getCommand();
+        if (!c) break;           
+        std::cout << *c << "\n"; 
+        if (fcp.getState() == GameState::ExitProgram) break;
+    }
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    if (argc >= 2) {
+        std::string arg1 = argv[1];
+        if (arg1 == "-console") return runConsole();
+        if (arg1 == "-file") {
+            if (argc < 3) { std::cerr << "error: -file requires a filename\n"; return 2; }
+            return runFile(argv[2]);
+        }
+        if (arg1 == "--test") { testCommandProcessor(); return 0; }
+        std::cerr << "usage:\n  a2 -console\n  a2 -file <filename>\n  a2 --test\n";
+        return 2;
+    }
+    testCommandProcessor();
     return 0;
 }
