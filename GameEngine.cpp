@@ -381,6 +381,95 @@ bool GameEngine::cmd_end() {
 }
 
 // ============================
+//        GAME LOOP
+// ============================
+void GameEngine::reinforcementPhase(){
+    std::cout << "\n=== Reinforcement Phase ===" << std::endl;
+    for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
+        Player* p = *pIt;
+
+        // base reinforcement = max(3, number of territories / 3)
+        int terrCount = static_cast<int>(p->getTerritories()->size());
+        int baseReinforcements = std::max(3, terrCount / 3);
+
+        int bonus = 0;
+
+        // check continents for ownership
+        //Bonus is decided by wether player owns ALL the territories in it's continent
+        std::vector<Continent*> continents = map_->getContinents();
+        for (auto cIt = continents.begin(); cIt != continents.end(); ++cIt) {
+            Continent* c = *cIt;
+            bool ownsAll = true;
+
+            std::vector<Territory*> territories = c->getTerritoriesPtr();
+            for (auto tIt = territories.begin(); tIt != territories.end(); ++tIt) {
+                Territory* t = *tIt;
+                if (t->getPlayer() != p) {
+                    ownsAll = false;
+                    break;
+                }
+            }
+            if (ownsAll) {
+                //Number is bonus value(visible in any .map file)
+                bonus += c->getNumber();
+            }
+        }
+        int total = baseReinforcements + bonus;
+        p->addReinforcements(total);
+        std::cout << p->getName() << " receives " << total << " armies." << std::endl;
+    }
+};
+
+void GameEngine::issueOrdersPhase(){
+    std::cout << "\n=== Issuing Orders ===" << std::endl;
+    for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
+        Player* p = *pIt;
+        if (!p->isDoneIssuing()) {
+            p->issueOrder(deck_);
+        }
+    }
+};
+
+void GameEngine::executeOrdersPhase(){
+    std::cout << "\n=== Executing Orders ===" << std::endl;
+    for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
+        Player* p = *pIt;
+        if (p->hasOrders()) {
+            std::cout << "\n=== Executing " << p->getName() << " order ===" << std::endl;
+            Order* order = p->nextOrder();
+            order->execute();
+        }
+    }
+
+    std::vector<Player*>* playersLeft = new std::vector<Player*>();
+    for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
+        Player* p = *pIt;
+        if (p->getTerritories()->empty()) {
+            std::cout << "\n=== " << p->getName() << " is out of the game! (No territories left) ===" << std::endl;
+            continue;
+        }
+        playersLeft->push_back(p);
+    }
+    delete players_;
+    players_ = playersLeft;
+};
+
+void GameEngine::mainGameLoop(){
+    std::cout << "\n=== Starting the game... ===" << std::endl;
+
+    if(players_->size()>1){
+        reinforcementPhase();
+        issueOrdersPhase();
+        executeOrdersPhase();
+    }
+    std::cout << "\n=== GAME OVER! ===" << std::endl;
+    if(!players_->empty()){
+        std::cout << "Winner: " << players_->front()->getName() << std::endl;
+    }
+};
+
+
+// ============================
 //        HELPER METHODS
 // ============================
 
