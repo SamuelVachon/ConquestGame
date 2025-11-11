@@ -1,7 +1,7 @@
 #include "Orders.h"
 #include "Map.h"
 #include "Player.h"
-
+#include "LoggingObserver.h"
 
 // Methods for Orders Class
 // Getters
@@ -112,6 +112,11 @@ ostream& operator <<(ostream& os, const Order& order){
 
     return os;
 };
+// Assignment 2 part 5 addition:
+std::string Order::stringToLog() const {
+    // Keep the line simple for the log
+    return "ORDER-EXECUTED " + getDescription() + " :: " + getEffect();
+}
 
 // Methods for Deploy Order Class
 
@@ -206,7 +211,12 @@ if (*numArmies <= 0) {
 
 void DeployOrder::execute() {
     cout << "\n[Executing Deploy Order...]\n";
-    if (!validate()) { setEffect("Invalid order — deployment failed."); cout << getEffect() << endl; return; }
+    if (!validate()) {
+        setEffect("Invalid order — deployment failed.");
+        cout << getEffect() << endl;
+        notify();                    // Part 5 addition
+        return;
+    }
 
     Player* p = getIssuer();
     Territory* t = getTarget();
@@ -214,13 +224,16 @@ void DeployOrder::execute() {
     if (!p->spendReinforcements(*numArmies)) {
         setEffect("Invalid: not enough armies in reinforcement pool.");
         cout << getEffect() << endl;
+        notify();                    // Part 5 addition
         return;
     }
 
     t->setArmy(t->getArmy() + *numArmies);
     setEffect("Deployed " + std::to_string(*numArmies) + " armies to " + t->getName() + ".");
     cout << getEffect() << endl;
+    notify();                        // Part 5 addition
 }
+
 
 
 ostream& operator<<(ostream& os, const DeployOrder& order) {
@@ -402,37 +415,39 @@ bool AdvanceOrder::validate() {
 
 void AdvanceOrder::execute() {
     cout << "\n[Executing Advance Order...]\n";
-    if (!validate()) { setEffect("Invalid order — advance failed."); cout << getEffect() << endl; return; }
+    if (!validate()) {
+        setEffect("Invalid order — advance failed.");
+        cout << getEffect() << endl;
+        notify();                    // Part 5 addition (assign 2)
+        return;
+    }
 
     Player* issuer = getIssuer();
     Territory* src = getSource();
     Territory* tgt = getTarget();
     int moving = *numArmies;
 
-    // Move armies out of source
     src->setArmy(src->getArmy() - moving);
 
-    // Case 1: same owner → move
     if (tgt->getPlayer() == issuer || tgt == src) {
         tgt->setArmy(tgt->getArmy() + moving);
         setEffect("Moved " + to_string(moving) + " armies from " + src->getName() + " to " + tgt->getName() + ".");
         cout << getEffect() << endl;
+        notify();                    // Part 5 addition (assign 2)
         return;
     }
 
-    // Case 2: enemy → battle simulation
     Player* defender = tgt->getPlayer();
     int atk = moving;
     int def = tgt->getArmy();
 
     srand(static_cast<unsigned>(time(nullptr)));
     while (atk > 0 && def > 0) {
-        // attackers shoot
         int killsOnDef = 0;
         for (int i = 0; i < atk; ++i) if ((rand() % 100) < 60) ++killsOnDef;
         def = max(0, def - killsOnDef);
         if (def == 0) break;
-        // defenders shoot
+
         int killsOnAtk = 0;
         for (int i = 0; i < def; ++i) if ((rand() % 100) < 70) ++killsOnAtk;
         atk = max(0, atk - killsOnAtk);
@@ -448,7 +463,9 @@ void AdvanceOrder::execute() {
         setEffect("Attack failed on " + tgt->getName() + " (defenders left: " + to_string(def) + ").");
     }
     cout << getEffect() << endl;
+    notify();                        // Part 5 addition (assign 2)
 }
+
 
 // Stream Operator
 
@@ -576,6 +593,7 @@ void BombOrder::execute() {
     if (!validate()) {
         setEffect("Invalid order — bombing failed.");
         cout << getEffect() << endl;
+        notify();                    // Part 5 addition (assign 2)
         return;
     }
 
@@ -585,12 +603,13 @@ void BombOrder::execute() {
 
     target->setArmy(destroyedArmies);
 
-    setEffect("Bombed " + target->getName() + 
-              ": enemy armies reduced from " + 
+    setEffect("Bombed " + target->getName() +
+              ": enemy armies reduced from " +
               to_string(originalArmies) + " to " + to_string(destroyedArmies) + ".");
-
     cout << getEffect() << endl;
-};
+    notify();                        // Part 5 addition (assign 2)
+}
+
 
 // Stream Operator
 
@@ -692,7 +711,12 @@ static Player* getNeutralPlayer() {
 
 void BlockadeOrder::execute() {
     cout << "\n[Executing Blockade Order...]\n";
-    if (!validate()) { setEffect("Invalid order — blockade failed."); cout << getEffect() << endl; return; }
+    if (!validate()) {
+        setEffect("Invalid order — blockade failed.");
+        cout << getEffect() << endl;
+        notify();                    // Part 5 addition (assign 2)
+        return;
+    }
 
     Territory* t = getTarget();
     int newArmies = t->getArmy() * 2;
@@ -700,7 +724,9 @@ void BlockadeOrder::execute() {
     t->setPlayer(getNeutralPlayer());
     setEffect("Blockade on " + t->getName() + ": doubled to " + to_string(newArmies) + " and transferred to Neutral.");
     cout << getEffect() << endl;
+    notify();                        // Part 5 addition (assign 2)
 }
+
 
 // Stream Operator
 
@@ -868,6 +894,7 @@ void AirliftOrder::execute() {
     if (!validate()) {
         setEffect("Invalid order — airlift failed.");
         cout << getEffect() << endl;
+        notify();                    // Part 5 addition (assign 2)
         return;
     }
 
@@ -875,15 +902,15 @@ void AirliftOrder::execute() {
     Territory* tgt = getTarget();
     int movingArmies = *numArmies;
 
-    // Move armies regardless of adjacency
     src->setArmy(src->getArmy() - movingArmies);
     tgt->setArmy(tgt->getArmy() + movingArmies);
 
     setEffect("Airlifted " + to_string(movingArmies) + " armies from " +
               src->getName() + " to " + tgt->getName() + ".");
-
     cout << getEffect() << endl;
-};
+    notify();                        // Part 5 addition (assign 2)
+}
+
 
 // Stream Operator
 
@@ -997,7 +1024,12 @@ bool NegotiateOrder::validate() {
 
 void NegotiateOrder::execute() {
     cout << "\n[Executing Negotiate Order...]\n";
-    if (!validate()) { setEffect("Invalid order — negotiation failed."); cout << getEffect() << endl; return; }
+    if (!validate()) {
+        setEffect("Invalid order — negotiation failed.");
+        cout << getEffect() << endl;
+        notify();                    // Part 5 addition (assign 2)
+        return;
+    }
 
     Player* p1 = getIssuer();
     Player* p2 = otherPlayer;
@@ -1006,7 +1038,9 @@ void NegotiateOrder::execute() {
 
     setEffect("Negotiation established between " + p1->getName() + " and " + p2->getName() + " (no attacks this turn).");
     cout << getEffect() << endl;
+    notify();                        // Part 5 addition (assign 2)
 }
+
 
 // Stream Operator
 
@@ -1114,10 +1148,14 @@ void OrdersList::addOrder(Order* order) {
         cout << "Cannot add null Order.\n";
         return;
     }
-
     orders->push_back(order);
     cout << "Order added successfully.\n";
-};
+
+    // Part 5 addition (assign 2)
+    lastAdded_ = order;
+    notify();
+}
+
 
 // Moves an Order from one position to another
 void OrdersList::moveOrder(int fromIndex, int toIndex) {
@@ -1134,6 +1172,12 @@ void OrdersList::moveOrder(int fromIndex, int toIndex) {
     cout << "Order moved from index " << fromIndex 
          << " to " << toIndex << ".\n";
 };
+
+// Part 5 addition (assign 2)
+std::string OrdersList::stringToLog() const {
+    return std::string("ORDER-ADDED ") + (lastAdded_ ? lastAdded_->getDescription() : "(null)");
+}
+
 
 // Stream Operator
 
