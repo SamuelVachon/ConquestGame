@@ -34,6 +34,8 @@ public:
     // Driver helpers
     void addTerritory(Territory* t);         // Player does NOT own Territory*
     std::vector<Territory*>* getTerritories();
+
+    // ====== A2 Part 3 add-ons ======
     void addReinforcements(int number);
 
     //Related to main game loop
