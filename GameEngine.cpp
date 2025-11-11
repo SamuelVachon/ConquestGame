@@ -99,16 +99,6 @@ std::string GameEngine::stateName() const {
     return "unknown";
 }
 
-// Centralize all state updates here so we also log via notify()
-void GameEngine::transition(State newState) {
-    *state_ = newState;
-    notify();                 // <-- LogObserver::update(...)
-}
-
-//  What gets written to gamelog.txt by LogObserver
-std::string GameEngine::stringToLog() const {
-    return "STATE " + stateName();
-}
 
 // Centralize state changes + notify the observer
 void GameEngine::transition(State newState) {
@@ -457,3 +447,4 @@ void GameEngine::startupPhase() {
     }
     
 }
+
