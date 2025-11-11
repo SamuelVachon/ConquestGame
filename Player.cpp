@@ -12,7 +12,7 @@ Player::Player()
   terrs_(new std::vector<Territory*>()),
   hand_(new Hand()),
   orders_(new OrdersList()),
-  reinforcemtnts_(50) {}
+  reinforcements_(50),
   doneIssuing_(false) {}
 
 //Parametrized constructor: Creates a player with a custom name but otherwise identical to the default constructor
@@ -21,7 +21,7 @@ Player::Player(const std::string& name)
   terrs_(new std::vector<Territory*>()),
   hand_(new Hand()),
   orders_(new OrdersList()),
-  reinforcemtnts_(50) {}
+  reinforcements_(50),
   doneIssuing_(false) {}
 
 /*Copy constructor: Initializes all pointer to nullptr, uses deepCopyForm to make a deep copy of
@@ -106,8 +106,6 @@ void Player::addTerritory(Territory* t) {
 
 // ====== A2 Part 3 Modifications ======
 
-void Player::addReinforcements(int number) { reinforcements_+=number; }
-
 void Player::issueOrder(Deck* deck){
     if (reinforcements_ > 0) {
         Territory* target = toDefend().front();
@@ -144,7 +142,7 @@ void Player::issueOrder(Deck* deck){
     }
 
     // optionally play a card
-    if (!hand_->size()>0) {
+    if (!(hand_->size()>0)) {
 
         hand_->playCard(hand_->size()-1, this, deck);
     }
@@ -191,7 +189,7 @@ void Player::deepCopyFrom(const Player& other) {
     // We own Hand and OrdersList → deep-copy them
     hand_  = new Hand(*other.hand_);
     orders_= new OrdersList(*other.orders_);
-    reinforcemtnts_ = other.reinforcemtnts_;
+    reinforcements_ = other.reinforcements_;
     doneIssuing_ = other.doneIssuing_;
 }
 
@@ -203,19 +201,19 @@ Hand* Player::getHand() const {
 
 // Reinforcement pool
 void Player::addReinforcements(int n) {
-    reinforce_ += n;
+    reinforcements_ += n;
 }
 
 bool Player::spendReinforcements(int n) {
-    if (n <= reinforce_) {
-        reinforce_ -= n;
+    if (n <= reinforcements_) {
+        reinforcements_ -= n;
         return true;
     }
     return false;
 }
 
 int Player::reinforcementPool() const {
-    return reinforce_;
+    return reinforcements_;
 }
 
 // Turn/conquest flags

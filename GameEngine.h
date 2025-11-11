@@ -36,13 +36,8 @@ public:
 
     // ===== Top-level loop
     void runConsole();
-
+    void startupPhase();
     // ===== State helpers
-
-    // For testing/automation you can call commands directly:
-    bool handleCommand(const std::string& cmd, const std::string& arg = "");
-
-    // Introspection
     State getState() const;
     std::string stateName() const;
     void transition(State newState);

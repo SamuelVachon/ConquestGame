@@ -36,7 +36,6 @@ public:
     std::vector<Territory*>* getTerritories();
 
     // ====== A2 Part 3 add-ons ======
-    void addReinforcements(int number);
 
     //Related to main game loop
     void issueOrder(Deck* deck);
@@ -76,14 +75,15 @@ private:
     std::vector<Territory*>* terrs_;
     Hand*        hand_;
     OrdersList*  orders_;
-    int reinforcemtnts_;
     bool doneIssuing_;
-// Internal helper
-    void deepCopyFrom(const Player& other); // deep copy used in copy constructor
     // ====== A2 Part 4 Fields ======
-    int reinforce_ = 0;
+    int reinforcements_;
     bool conqueredThisTurn_ = false;
     std::vector<Player*> negotiated_;
+
+    // Internal helper
+    void deepCopyFrom(const Player& other); // deep copy used in copy constructor
+
 
 };
 

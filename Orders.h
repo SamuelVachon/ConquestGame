@@ -2,7 +2,7 @@
 #ifndef ORDERS_H
 #define ORDERS_H
 
-#include "LoggingObserver.h"   
+#include "LoggingObserver.h"
 #include <string>
 #include <iostream>
 using namespace std;
@@ -279,7 +279,6 @@ class OrdersList: public Subject, public ILoggable{
     int size() const;                   // Returns number of orders
     void removeOrder(int index);        // Deletes an order at index
     void moveOrder(int fromIndex, int toIndex);  // Moves an order between positions
-    void addOrder(Order* order);   // will call notify()
     std::string stringToLog() const override;  // add
 
     // Stream operator
