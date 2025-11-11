@@ -2,6 +2,7 @@
 #ifndef ORDERS_H
 #define ORDERS_H
 
+#include "LoggingObserver.h"   
 #include <string>
 #include <iostream>
 using namespace std;
@@ -11,7 +12,7 @@ class Territory;   // Forward declaration of Territory class
 
 void testOrdersLists();
 
-class Order{
+class Order: public Subject, public ILoggable{
 
     private:
 
@@ -24,6 +25,7 @@ class Order{
     public:
 
     // Getters
+    string stringToLog() const override;
     string getDescription() const;
     string getEffect() const;
     Player* getIssuer() const;
@@ -255,7 +257,7 @@ public:
 
 // CLASS: OrdersList
 
-class OrdersList{
+class OrdersList: public Subject, public ILoggable{
 
     private:
 
@@ -263,7 +265,8 @@ class OrdersList{
 
     public:
 
-    //Constructors
+    //Constructor
+
     OrdersList();
     OrdersList(const OrdersList& other);
     OrdersList& operator=(const OrdersList& other);
@@ -277,6 +280,8 @@ class OrdersList{
     void removeOrder(int index);        // Deletes an order at index
     void addOrder(Order* order);        // Adds a new order to the list
     void moveOrder(int fromIndex, int toIndex);  // Moves an order between positions
+    void addOrder(Order* order);   // will call notify()
+    std::string stringToLog() const override;  // add
 
     // Stream operator
 
