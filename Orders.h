@@ -278,7 +278,6 @@ class OrdersList: public Subject, public ILoggable{
     Order* getOrder(int index) const;   // Returns an order by index
     int size() const;                   // Returns number of orders
     void removeOrder(int index);        // Deletes an order at index
-    void addOrder(Order* order);        // Adds a new order to the list
     void moveOrder(int fromIndex, int toIndex);  // Moves an order between positions
     void addOrder(Order* order);   // will call notify()
     std::string stringToLog() const override;  // add
