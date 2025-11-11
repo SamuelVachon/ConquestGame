@@ -46,11 +46,12 @@ public:
     bool cmd_validatemap();
     bool cmd_addplayer(const std::string& name);
     bool cmd_assigncountries();
-    bool cmd_issueorder();
-    bool cmd_endissueorders();
-    bool cmd_executeorders();
-    bool cmd_endexecorders();
-    bool cmd_play();
+    bool cmd_gamestart();
+    bool cmd_issueorder();           // ask each player to issue a dummy order
+    bool cmd_endissueorders();       // transition to ExecuteOrders
+    bool cmd_executeorders();        // execute all players’ orders (demo)
+    bool cmd_endexecorders();        // either Win or back to IssueOrders
+    bool cmd_play();                 // back to IssueOrders
     bool cmd_win();
     bool cmd_end();
 

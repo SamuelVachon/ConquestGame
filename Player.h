@@ -62,6 +62,7 @@ private:
     std::vector<Territory*>* terrs_;
     Hand*        hand_;
     OrdersList*  orders_;
+    int reinforcemtnts_;
 
 // Internal helper
     void deepCopyFrom(const Player& other); // deep copy used in copy constructor
