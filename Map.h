@@ -35,7 +35,7 @@ class Continent{
     std::string getName();
     int getNumber();
     std::vector<int> getTerritories();
-     std::vector<Territory*> getTerritoriesPtr();
+    std::vector<Territory*> getTerritoriesPtr();
 
     friend std::ostream& operator<<(std::ostream& os, const Continent& c);
 
