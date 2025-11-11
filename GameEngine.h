@@ -3,22 +3,15 @@
 
 #include <string>
 #include <vector>
-#include <memory>
-#include <iosfwd>   // for std::ostream forward
-#include <ostream>  // ensures operator<< signature is known
+#include <iosfwd>
+#include "LoggingObserver.h"   // for Subject + ILoggable
 
-// Forward decls to avoid heavy includes in header
 class Map;
-class MapLoader;    // from Map.h
-class Player;       // from Player.h
-class OrdersList;   // from Orders.h
-class Deck;         // from Cards.h
-class Hand;         // from Cards.h
-class Territory;
+class MapLoader;
+class Player;
+class Deck;
 
-void testGameStates();
-
-class GameEngine {
+class GameEngine : public Subject, public ILoggable {  // loggable subject
 public:
     enum class State {
         Start,
@@ -32,34 +25,23 @@ public:
         End
     };
 
+    // ===== Ctors / dtor / copy
     GameEngine();
     GameEngine(const GameEngine& other);
     GameEngine& operator=(const GameEngine& other);
     ~GameEngine();
 
-    // Driver entry
-    void runConsole();  // interactive loop for testGameStates()
+    // ===== Top-level loop
+    void runConsole();
 
-    // For testing/automation you can call commands directly:
-    bool handleCommand(const std::string& cmd, const std::string& arg = "");
-
-    // Introspection
+    // ===== State helpers
     State getState() const;
     std::string stateName() const;
+    void transition(State newState);                
+    std::string stringToLog() const override;       
 
-    // Give the printer access to private members (so it can read players_)
-    friend std::ostream& operator<<(std::ostream& os, const GameEngine& ge);
-
-private:
-    // All user-defined members as pointers (assignment rule)
-    State*                 state_;
-    MapLoader*             mapLoader_;
-    Map*                   map_;
-    std::vector<Player*>*  players_;
-    Deck*                  deck_;
-    bool*                  countriesAssigned_;
-
-    // Helpers for transitions
+    // ===== Commands / FSM
+    bool handleCommand(const std::string& cmd, const std::string& arg);
     bool cmd_loadmap(const std::string& filename);
     bool cmd_validatemap();
     bool cmd_addplayer(const std::string& name);
@@ -73,21 +55,25 @@ private:
     bool cmd_win();
     bool cmd_end();
 
-    // Utilities
+    // ===== Helpers
     void resetMapAndCountries();
-    void clearAll();
-
-    // Deep copy helper
-    void deepCopyFrom(const GameEngine& other);
-
-    // Round-robin assignment
     void assignTerritoriesRoundRobin();
 
-    //StartUpPhase method
-    void startupPhase();
+    friend std::ostream& operator<<(std::ostream& os, const GameEngine& ge);
+
+private:
+    // pointers per assignment rules
+    State* state_;
+    MapLoader* mapLoader_;
+    Map* map_;
+    std::vector<Player*>* players_;
+    Deck* deck_;
+    bool* countriesAssigned_;
+
+    // copy helpers
+    void deepCopyFrom(const GameEngine& other);
+    void clearAll();
 };
 
-// keep the declaration visible to users of the header
-std::ostream& operator<<(std::ostream& os, const GameEngine& ge);
+#endif 
 
-#endif // GAMEENGINE_H

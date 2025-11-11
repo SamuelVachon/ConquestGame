@@ -37,6 +37,25 @@ public:
     // Stream operator
     friend std::ostream& operator<<(std::ostream& os, const Player& p); // prints player summary(name territory, hand size,order count)
 
+    // ====== A2 Part 4 Additions ======
+
+    // Reinforcement pool
+    void addReinforcements(int n);
+    bool spendReinforcements(int n);
+    int reinforcementPool() const;
+
+    // Turn/conquest flags
+    void markConquered();
+    bool conqueredThisTurn() const;
+    void resetTurnFlags();
+
+    // Negotiation (truce)
+    void addTruceWith(Player* p);
+    bool hasTruceWith(Player* p) const;
+
+    // Hand getter
+    Hand* getHand() const;      
+
 private:
     // Per assignment: user-defined members as pointer types
     std::string* name_;   
@@ -47,4 +66,10 @@ private:
 
 // Internal helper
     void deepCopyFrom(const Player& other); // deep copy used in copy constructor
+
+// ====== A2 Part 4 Fields ======
+int reinforce_ = 0;
+bool conqueredThisTurn_ = false;
+std::vector<Player*> negotiated_;
 };
+

@@ -206,36 +206,22 @@ if (*numArmies <= 0) {
 
 void DeployOrder::execute() {
     cout << "\n[Executing Deploy Order...]\n";
+    if (!validate()) { setEffect("Invalid order — deployment failed."); cout << getEffect() << endl; return; }
 
-    // Validate the order first
-    if (!validate()) {
-        setEffect("Invalid order — deployment failed.");
-        std::cout << getEffect() << std::endl;
+    Player* p = getIssuer();
+    Territory* t = getTarget();
+
+    if (!p->spendReinforcements(*numArmies)) {
+        setEffect("Invalid: not enough armies in reinforcement pool.");
+        cout << getEffect() << endl;
         return;
     }
 
-    // Access issuer and target
-    Player* issuer = getIssuer();
-    Territory* target = getTarget();
+    t->setArmy(t->getArmy() + *numArmies);
+    setEffect("Deployed " + std::to_string(*numArmies) + " armies to " + t->getName() + ".");
+    cout << getEffect() << endl;
+}
 
-    // Add the armies to the target territory
-    int currentArmy = target->getArmy();
-    target->setArmy(currentArmy + *numArmies);
-
-
-    // Display result for demonstration
-    std::cout << "Deploying " << *numArmies << " armies to territory "
-              << target->getName() << " owned by "
-              << issuer->getName() << ".\n";
-
-    std::cout << "New army count on territory: " << target->getArmy() << std::endl;
-
-    // Record effect message (for operator<< output)
-    setEffect("Successfully deployed " + std::to_string(*numArmies) +
-              " armies to " + target->getName() + ".");
-
-    std::cout << getEffect() << std::endl;
-};
 
 ostream& operator<<(ostream& os, const DeployOrder& order) {
     os << "\n[DeployOrder]\n";
@@ -351,6 +337,12 @@ bool AdvanceOrder::validate() {
         return false;
     }
 
+    // Negotiation rule: cannot attack if players have a truce
+     if (getTarget()->getPlayer() && getIssuer()->hasTruceWith(getTarget()->getPlayer())) {
+    cout << "Invalid: players are under negotiation (truce)." << endl;
+    return false;
+    }
+
     if (getSource() == nullptr || getTarget() == nullptr) {
         cout << "Invalid: Missing source or target territory.\n";
         return false;
@@ -410,56 +402,53 @@ bool AdvanceOrder::validate() {
 
 void AdvanceOrder::execute() {
     cout << "\n[Executing Advance Order...]\n";
-
-    if (!validate()) {
-        setEffect("Invalid order — advance failed.");
-        cout << getEffect() << endl;
-        return;
-    }
+    if (!validate()) { setEffect("Invalid order — advance failed."); cout << getEffect() << endl; return; }
 
     Player* issuer = getIssuer();
     Territory* src = getSource();
     Territory* tgt = getTarget();
-    int movingArmies = *numArmies;
+    int moving = *numArmies;
 
-    // Case 1: Same player owns both territories → move armies
-    if (tgt->getPlayer() == issuer) {
-        src->setArmy(src->getArmy() - movingArmies);
-        tgt->setArmy(tgt->getArmy() + movingArmies);
+    // Move armies out of source
+    src->setArmy(src->getArmy() - moving);
 
-        setEffect("Moved " + to_string(movingArmies) +
-                  " armies from " + src->getName() +
-                  " to " + tgt->getName() + ".");
+    // Case 1: same owner → move
+    if (tgt->getPlayer() == issuer || tgt == src) {
+        tgt->setArmy(tgt->getArmy() + moving);
+        setEffect("Moved " + to_string(moving) + " armies from " + src->getName() + " to " + tgt->getName() + ".");
         cout << getEffect() << endl;
+        return;
     }
-    // Case 2: Attack another player’s territory
-    else {
-        cout << "Battle initiated between " << issuer->getName()
-             << " and " << tgt->getPlayer()->getName() << "!\n";
 
-        int attacking = movingArmies;
-        int defending = tgt->getArmy();
+    // Case 2: enemy → battle simulation
+    Player* defender = tgt->getPlayer();
+    int atk = moving;
+    int def = tgt->getArmy();
 
-        // Simple battle simulation
-        if (attacking > defending) {
-            src->setArmy(src->getArmy() - movingArmies);
-            tgt->setPlayer(issuer);
-            tgt->setArmy(attacking - defending);
-
-            setEffect("Conquered " + tgt->getName() +
-                      " with " + to_string(tgt->getArmy()) + " armies remaining.");
-            cout << getEffect() << endl;
-        } else {
-            src->setArmy(src->getArmy() - movingArmies);
-            tgt->setArmy(defending - attacking);
-
-            setEffect("Attack on " + tgt->getName() +
-                      " failed. Defenders held with " +
-                      to_string(tgt->getArmy()) + " armies remaining.");
-            cout << getEffect() << endl;
-        }
+    srand(static_cast<unsigned>(time(nullptr)));
+    while (atk > 0 && def > 0) {
+        // attackers shoot
+        int killsOnDef = 0;
+        for (int i = 0; i < atk; ++i) if ((rand() % 100) < 60) ++killsOnDef;
+        def = max(0, def - killsOnDef);
+        if (def == 0) break;
+        // defenders shoot
+        int killsOnAtk = 0;
+        for (int i = 0; i < def; ++i) if ((rand() % 100) < 70) ++killsOnAtk;
+        atk = max(0, atk - killsOnAtk);
     }
-};
+
+    if (def == 0 && atk > 0) {
+        tgt->setPlayer(issuer);
+        tgt->setArmy(atk);
+        issuer->markConquered();
+        setEffect("Conquered " + tgt->getName() + " with " + to_string(atk) + " surviving armies.");
+    } else {
+        tgt->setArmy(def);
+        setEffect("Attack failed on " + tgt->getName() + " (defenders left: " + to_string(def) + ").");
+    }
+    cout << getEffect() << endl;
+}
 
 // Stream Operator
 
@@ -696,32 +685,22 @@ bool BlockadeOrder::validate() {
     return true;
 };
 
-// Execute
+static Player* getNeutralPlayer() {
+    static Player neutral("Neutral");
+    return &neutral;
+}
 
 void BlockadeOrder::execute() {
     cout << "\n[Executing Blockade Order...]\n";
+    if (!validate()) { setEffect("Invalid order — blockade failed."); cout << getEffect() << endl; return; }
 
-    if (!validate()) {
-        setEffect("Invalid order — blockade failed.");
-        cout << getEffect() << endl;
-        return;
-    }
-
-    Territory* target = getTarget();
-    int originalArmies = target->getArmy();
-    int newArmies = originalArmies * 3;
-
-    target->setArmy(newArmies);
-
-    // For simplicity, simulate a "neutral" player with nullptr
-    target->setPlayer(nullptr);
-
-    setEffect("Blockade applied on " + target->getName() +
-              ". Armies tripled to " + to_string(newArmies) +
-              " and ownership transferred to Neutral.");
-    
+    Territory* t = getTarget();
+    int newArmies = t->getArmy() * 2;
+    t->setArmy(newArmies);
+    t->setPlayer(getNeutralPlayer());
+    setEffect("Blockade on " + t->getName() + ": doubled to " + to_string(newArmies) + " and transferred to Neutral.");
     cout << getEffect() << endl;
-};
+}
 
 // Stream Operator
 
@@ -1018,26 +997,16 @@ bool NegotiateOrder::validate() {
 
 void NegotiateOrder::execute() {
     cout << "\n[Executing Negotiate Order...]\n";
-
-    if (!validate()) {
-        setEffect("Invalid order — negotiation failed.");
-        cout << getEffect() << endl;
-        return;
-    }
+    if (!validate()) { setEffect("Invalid order — negotiation failed."); cout << getEffect() << endl; return; }
 
     Player* p1 = getIssuer();
     Player* p2 = otherPlayer;
+    p1->addTruceWith(p2);
+    p2->addTruceWith(p1);
 
-    // Here you would add both players to each other's “non-attack list”
-    // (for now, just simulate)
-    cout << "Negotiation established between " << p1->getName()
-         << " and " << p2->getName() << ".\n";
-
-    setEffect("Players " + p1->getName() + " and " + p2->getName() +
-              " cannot attack each other this turn.");
-
+    setEffect("Negotiation established between " + p1->getName() + " and " + p2->getName() + " (no attacks this turn).");
     cout << getEffect() << endl;
-};
+}
 
 // Stream Operator
 
