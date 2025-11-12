@@ -73,8 +73,7 @@ int main(int argc, char** argv) {
                   << "  a2 --orders-exec       (run execution demo)\n";
         return 2;
     }
-
-    // Default when no args: keep your existing defaults
+    // Default
     testCommandProcessor();
     testLoggingObserver();
     testOrdersLists();
