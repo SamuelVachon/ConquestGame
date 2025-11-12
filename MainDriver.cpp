@@ -3,7 +3,9 @@
 #include <string>
 
 extern void testLoggingObserver();    // from LoggingObserverDriver.cpp
-extern void testCommandProcessor();   
+extern void testCommandProcessor(); 
+extern void testOrdersLists();
+extern void testOrderExecution();
 // Run interactive console mode
 static int runConsole() {
     CommandProcessor cp;
@@ -33,22 +35,50 @@ static int runFile(const std::string& path) {
 int main(int argc, char** argv) {
     if (argc >= 2) {
         std::string arg1 = argv[1];
+
         if (arg1 == "-console") return runConsole();
+
         if (arg1 == "-file") {
             if (argc < 3) { std::cerr << "error: -file requires a filename\n"; return 2; }
             return runFile(argv[2]);
         }
+
         if (arg1 == "--test") {
-            
             testCommandProcessor();
-            testLoggingObserver();   
-           
+            testLoggingObserver();
             return 0;
         }
-        std::cerr << "usage:\n  a2 -console\n  a2 -file <filename>\n  a2 --test\n";
+
+        // NEW: orders tests
+        if (arg1 == "--orders") {        // run both
+            testOrdersLists();
+            testOrderExecution();
+            return 0;
+        }
+        if (arg1 == "--orders-list") {   // only list behavior
+            testOrdersLists();
+            return 0;
+        }
+        if (arg1 == "--orders-exec") {   // only execution rules
+            testOrderExecution();
+            return 0;
+        }
+
+        std::cerr << "usage:\n"
+                  << "  a2 -console\n"
+                  << "  a2 -file <filename>\n"
+                  << "  a2 --test\n"
+                  << "  a2 --orders            (run both orders tests)\n"
+                  << "  a2 --orders-list       (run OrdersList demo)\n"
+                  << "  a2 --orders-exec       (run execution demo)\n";
         return 2;
     }
+
+    // Default when no args: keep your existing defaults
     testCommandProcessor();
-    testLoggingObserver();          
+    testLoggingObserver();
+    testOrdersLists();
+    testOrderExecution();
     return 0;
 }
+
