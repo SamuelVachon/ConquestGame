@@ -1,13 +1,13 @@
 #include "CommandProcessing.h"
 #include <iostream>
 #include <string>
+#include "GameEngine.h"
 
 extern void testLoggingObserver();    // from LoggingObserverDriver.cpp
 extern void testCommandProcessor();
 extern void testOrdersLists();
 extern void testMainGameLoop();
 extern void testOrderExecution();
-extern void startupPhase();s
 // Run interactive console mode
 static int runConsole() {
     CommandProcessor cp;
@@ -68,8 +68,12 @@ int main(int argc, char** argv) {
             testOrderExecution();
             return 0;
         }
+        if (arg1 == "--main-game"){
+            testMainGameLoop();
+        }
         if (arg1 == "--startup"){
-            startupPhase();
+            GameEngine* ge = new GameEngine();
+            ge->startupPhase();
             return 0;
         }
 
@@ -88,7 +92,8 @@ int main(int argc, char** argv) {
     testOrdersLists();
     testOrderExecution();
     testMainGameLoop();
-    startupPhase();
+    GameEngine* ge = new GameEngine();
+    ge->startupPhase();
     return 0;
 }
 

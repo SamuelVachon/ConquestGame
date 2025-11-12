@@ -212,7 +212,7 @@ if (*numArmies <= 0) {
 void DeployOrder::execute() {
     cout << "\n[Executing Deploy Order...]\n";
     if (!validate()) {
-        setEffect("Invalid order — deployment failed.");
+        setEffect("Invalid order - deployment failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition
         return;
@@ -416,7 +416,7 @@ bool AdvanceOrder::validate() {
 void AdvanceOrder::execute() {
     cout << "\n[Executing Advance Order...]\n";
     if (!validate()) {
-        setEffect("Invalid order — advance failed.");
+        setEffect("Invalid order - advance failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
@@ -591,7 +591,7 @@ void BombOrder::execute() {
     cout << "\n[Executing Bomb Order...]\n";
 
     if (!validate()) {
-        setEffect("Invalid order — bombing failed.");
+        setEffect("Invalid order - bombing failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
@@ -712,7 +712,7 @@ static Player* getNeutralPlayer() {
 void BlockadeOrder::execute() {
     cout << "\n[Executing Blockade Order...]\n";
     if (!validate()) {
-        setEffect("Invalid order — blockade failed.");
+        setEffect("Invalid order - blockade failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
@@ -892,7 +892,7 @@ void AirliftOrder::execute() {
     cout << "\n[Executing Airlift Order...]\n";
 
     if (!validate()) {
-        setEffect("Invalid order — airlift failed.");
+        setEffect("Invalid order - airlift failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
@@ -1025,7 +1025,7 @@ bool NegotiateOrder::validate() {
 void NegotiateOrder::execute() {
     cout << "\n[Executing Negotiate Order...]\n";
     if (!validate()) {
-        setEffect("Invalid order — negotiation failed.");
+        setEffect("Invalid order - negotiation failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
