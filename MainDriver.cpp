@@ -48,6 +48,7 @@ int main(int argc, char** argv) {
             testCommandProcessor();
             testLoggingObserver();
             testOrderExecution();
+            testOrdersLists();
             testMainGameLoop();
             return 0;
         }
@@ -81,6 +82,7 @@ int main(int argc, char** argv) {
     testLoggingObserver();
     testOrdersLists();
     testOrderExecution();
+    testMainGameLoop();
     return 0;
 }
 
