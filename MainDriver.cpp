@@ -7,6 +7,7 @@ extern void testCommandProcessor();
 extern void testOrdersLists();
 extern void testMainGameLoop();
 extern void testOrderExecution();
+extern void startupPhase();
 // Run interactive console mode
 static int runConsole() {
     CommandProcessor cp;
@@ -67,6 +68,10 @@ int main(int argc, char** argv) {
             testOrderExecution();
             return 0;
         }
+        if (arg1 == "--startup"){
+            startupPhase();
+            return 0;
+        }
 
         std::cerr << "usage:\n"
                   << "  a2 -console\n"
@@ -83,6 +88,7 @@ int main(int argc, char** argv) {
     testOrdersLists();
     testOrderExecution();
     testMainGameLoop();
+    startupPhase();
     return 0;
 }
 
