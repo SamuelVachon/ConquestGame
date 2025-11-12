@@ -7,7 +7,7 @@ extern void testCommandProcessor();
 extern void testOrdersLists();
 extern void testMainGameLoop();
 extern void testOrderExecution();
-extern void startupPhase();
+extern void startupPhase();s
 // Run interactive console mode
 static int runConsole() {
     CommandProcessor cp;
