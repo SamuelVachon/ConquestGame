@@ -64,6 +64,9 @@ public:
     void executeOrdersPhase();
     void mainGameLoop();
 
+    //Driver
+    //Need friend to access private fields
+    friend void testMainGameLoop();
     // ===== Helpers
     void resetMapAndCountries();
     void assignTerritoriesRoundRobin();

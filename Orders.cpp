@@ -21,7 +21,7 @@
     return target;
  };
 
- // Setters 
+ // Setters
  void Order::setDescription(const string& description){
     if(this->description){
         delete this->description;
@@ -182,7 +182,7 @@ if (getTarget() == nullptr) {
 }
 
 // Ownership check player must actually own the target territory
-    
+
     Player* issuer = getIssuer();
     Territory* target = getTarget();
 
@@ -221,7 +221,7 @@ void DeployOrder::execute() {
     Player* p = getIssuer();
     Territory* t = getTarget();
 
-    if (!p->spendReinforcements(*numArmies)) {
+    if (!p->spendDeployableUnits(*numArmies)) {
         setEffect("Invalid: not enough armies in reinforcement pool.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition
@@ -696,7 +696,7 @@ bool BlockadeOrder::validate() {
 
     if (!ownsTarget) {
         cout << "Invalid: Player " << issuer->getName()
-             << " does not own the target territory " 
+             << " does not own the target territory "
              << target->getName() << ".\n";
         return false;
     }
@@ -1082,7 +1082,7 @@ OrdersList::OrdersList() {
 OrdersList::OrdersList(const OrdersList& other) {
     this->orders = new vector<Order*>();
     for (Order* o : *other.orders) {
-        this->orders->push_back(o); 
+        this->orders->push_back(o);
     }
 };
 
@@ -1099,7 +1099,7 @@ OrdersList& OrdersList::operator=(const OrdersList& other) {
 
     // Deep copy new ones
     for (Order* o : *other.orders) {
-        orders->push_back(o); 
+        orders->push_back(o);
     }
 
     return *this;
@@ -1169,7 +1169,7 @@ void OrdersList::moveOrder(int fromIndex, int toIndex) {
     orders->erase(orders->begin() + fromIndex);
     orders->insert(orders->begin() + toIndex, temp);
 
-    cout << "Order moved from index " << fromIndex 
+    cout << "Order moved from index " << fromIndex
          << " to " << toIndex << ".\n";
 };
 

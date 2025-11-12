@@ -3,15 +3,17 @@
 #include <string>
 
 extern void testLoggingObserver();    // from LoggingObserverDriver.cpp
-extern void testCommandProcessor();   
+extern void testCommandProcessor();
+extern void testMainGameLoop();
+extern void testOrderExecution();
 // Run interactive console mode
 static int runConsole() {
     CommandProcessor cp;
     std::cout << "[mode] console (type :q to exit)\n";
     while (true) {
         Command* c = cp.getCommand();
-        if (!c) break;           
-        std::cout << *c << "\n"; 
+        if (!c) break;
+        std::cout << *c << "\n";
         if (cp.getState() == GameState::ExitProgram) break;
     }
     return 0;
@@ -23,8 +25,8 @@ static int runFile(const std::string& path) {
     std::cout << "[mode] file: " << path << "\n";
     while (true) {
         Command* c = fcp.getCommand();
-        if (!c) break;           
-        std::cout << *c << "\n"; 
+        if (!c) break;
+        std::cout << *c << "\n";
         if (fcp.getState() == GameState::ExitProgram) break;
     }
     return 0;
@@ -39,16 +41,17 @@ int main(int argc, char** argv) {
             return runFile(argv[2]);
         }
         if (arg1 == "--test") {
-            
+
             testCommandProcessor();
-            testLoggingObserver();   
-           
+            testLoggingObserver();
+            testOrderExecution();
+            testMainGameLoop();
             return 0;
         }
         std::cerr << "usage:\n  a2 -console\n  a2 -file <filename>\n  a2 --test\n";
         return 2;
     }
     testCommandProcessor();
-    testLoggingObserver();          
+    testLoggingObserver();
     return 0;
 }

@@ -53,9 +53,14 @@ public:
     // ====== A2 Part 4 Additions ======
 
     // Reinforcement pool
-    void addReinforcements(int n);
-    bool spendReinforcements(int n);
+    void addDeployableUnits(int n);
+    bool spendDeployableUnits(int n);
     int reinforcementPool() const;
+
+    //Helper related
+    void addReinforcements(int n);
+    void setReinforcements(int n);
+    int getDeployableUnits();
 
     // Turn/conquest flags
     void markConquered();
@@ -75,6 +80,8 @@ private:
     std::vector<Territory*>* terrs_;
     Hand*        hand_;
     OrdersList*  orders_;
+    //to avoid conflicts with orders using reinforcements
+    int deployableUnits;
     bool doneIssuing_;
     // ====== A2 Part 4 Fields ======
     int reinforcements_;
