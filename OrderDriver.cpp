@@ -295,7 +295,4 @@ void testOrderExecution() {
     cout << "===== end testOrderExecution() =====\n";
 }
 
-int main() {
-    testOrderExecution();   // or testOrdersLists();
-    return 0;
 }
