@@ -2,22 +2,23 @@
 #include <fstream>
 #include <algorithm>
 
+// Constructors & Deconstructors
 Subject::Subject()
 : observers_(new std::vector<Observer*>()) {}
 
 Subject::Subject(const Subject& other)
 : observers_(new std::vector<Observer*>(*other.observers_)) {}
 
+Subject::~Subject() {
+    delete observers_;
+    observers_ = nullptr;
+}
+// Assignment operator
 Subject& Subject::operator=(const Subject& other) {
     if (this != &other) {
         *observers_ = *other.observers_;
     }
     return *this;
-}
-
-Subject::~Subject() {
-    delete observers_;
-    observers_ = nullptr;
 }
 
 void Subject::attach(Observer* o) {
@@ -39,6 +40,7 @@ void Subject::notify() {
     }
 }
 
+// Constructors & Deconstructors
 LogObserver::LogObserver() {}
 LogObserver::~LogObserver() {}
 
@@ -51,5 +53,6 @@ void LogObserver::update(Subject* s) {
 
     out << loggable->stringToLog() << '\n';
 }
+
 
 
