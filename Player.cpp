@@ -13,6 +13,7 @@ Player::Player()
   hand_(new Hand()),
   orders_(new OrdersList()),
   reinforcements_(50),
+  deployableUnits(0),
   doneIssuing_(false) {}
 
 //Parametrized constructor: Creates a player with a custom name but otherwise identical to the default constructor
@@ -22,12 +23,13 @@ Player::Player(const std::string& name)
   hand_(new Hand()),
   orders_(new OrdersList()),
   reinforcements_(50),
+  deployableUnits(0),
   doneIssuing_(false) {}
 
 /*Copy constructor: Initializes all pointer to nullptr, uses deepCopyForm to make a deep copy of
 another Player object (New dynamic memory allocation) */
 Player::Player(const Player& other)
-: name_(nullptr), terrs_(nullptr), hand_(nullptr), orders_(nullptr), reinforcements_(0),doneIssuing_(false) {
+: name_(nullptr), terrs_(nullptr), hand_(nullptr), orders_(nullptr), reinforcements_(0),deployableUnits(0),doneIssuing_(false) {
     deepCopyFrom(other);
 }
 
@@ -112,7 +114,8 @@ void Player::issueOrder(Deck* deck){
         int deployCount = min(3, reinforcements_);
         orders_->addOrder(new DeployOrder(this, target, deployCount));
         reinforcements_ -= deployCount;
-        std::cout << name_ << " issues Deploy(" << deployCount
+        deployableUnits += deployCount;
+        std::cout << *name_ << " issues Deploy(" << deployCount
              << " to " << target->getName() << ")\n";
         if (reinforcements_ == 0)
             doneIssuing_ = false; // still can issue other orders
@@ -129,7 +132,7 @@ void Player::issueOrder(Deck* deck){
         Territory* tgt = toDefend().front();
         orders_->addOrder(new AdvanceOrder(this, src, tgt, 2));
 
-        std::cout << name_ << " issues Defensive Advance("
+        std::cout << *name_ << " issues Defensive Advance("
                   << src->getName() << " -> " << tgt->getName() << ")\n";
     }
 
@@ -137,14 +140,14 @@ void Player::issueOrder(Deck* deck){
         Territory* src = toDefend().front();
         Territory* tgt = toAttack().front();
         orders_->addOrder(new AdvanceOrder(this, src, tgt, 2));
-        std::cout << name_<< " issues Advance(" << src->getName()
+        std::cout << *name_<< " issues Advance(" << src->getName()
              << " -> " << tgt->getName() << ")\n";
     }
 
     // optionally play a card
-    if (!(hand_->size()>0)) {
+    if (hand_->size()>0) {
 
-        hand_->playCard(hand_->size()-1, this, deck);
+        hand_->playCard(hand_->size(), this, deck);
     }
 
     doneIssuing_ = true;
@@ -153,13 +156,13 @@ void Player::issueOrder(Deck* deck){
 bool Player::isDoneIssuing() const { return doneIssuing_; }
 bool Player::hasOrders() const { return !(orders_->size() < 1); }
 Order* Player::nextOrder() {
-    Order * order = nullptr;
-    int top = orders_->size()-1;
-    if(orders_->size() >1){
-        order = orders_->getOrder(top);
-        orders_->removeOrder(top);
-    }
-    return order;
+    //this check should in theory not be run since hasOrders can be called before calling this
+    //still is a good idea just to be sure
+    if (!orders_ || orders_->size() == 0)
+        return nullptr;
+
+    int top = orders_->size() - 1;
+    return orders_->getOrder(top);
 }
 
 void Player::addOrder(Order* order){
@@ -204,12 +207,24 @@ void Player::addReinforcements(int n) {
     reinforcements_ += n;
 }
 
-bool Player::spendReinforcements(int n) {
-    if (n <= reinforcements_) {
-        reinforcements_ -= n;
+//Helper mostly used for testing
+void Player::setReinforcements(int n){
+    reinforcements_ = n;
+}
+
+bool Player::spendDeployableUnits(int n) {
+    if (n <= deployableUnits) {
+        deployableUnits -= n;
         return true;
     }
     return false;
+}
+
+int Player::getDeployableUnits(){
+    return deployableUnits;
+}
+void Player::addDeployableUnits(int n){
+    deployableUnits += n;
 }
 
 int Player::reinforcementPool() const {

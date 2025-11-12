@@ -297,14 +297,14 @@ bool GameEngine::cmd_gamestart() {
         std::cout << "You must assign countries first.\n";
         return false;
     }
-    
+
     deck_ = new Deck(52); // create a new deck for the game
 
     for (auto* p : *players_) {
         Hand* hand = new Hand();
         hand->addCard(deck_->draw());
         hand->addCard(deck_->draw());
-        p->setHand(hand);      
+        p->setHand(hand);
     }
 
     std::random_device rd;
@@ -422,10 +422,15 @@ void GameEngine::reinforcementPhase(){
 
 void GameEngine::issueOrdersPhase(){
     std::cout << "\n=== Issuing Orders ===" << std::endl;
-    for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
-        Player* p = *pIt;
-        if (!p->isDoneIssuing()) {
-            p->issueOrder(deck_);
+    int countDoneIssuing = 0;
+    while(countDoneIssuing != players_->size()){
+        for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
+            Player* p = *pIt;
+            if (!p->isDoneIssuing()) {
+                p->issueOrder(deck_);
+            }else{
+                countDoneIssuing++;
+            }
         }
     }
 };
@@ -434,24 +439,50 @@ void GameEngine::executeOrdersPhase(){
     std::cout << "\n=== Executing Orders ===" << std::endl;
     for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
         Player* p = *pIt;
-        if (p->hasOrders()) {
-            std::cout << "\n=== Executing " << p->getName() << " order ===" << std::endl;
-            Order* order = p->nextOrder();
-            order->execute();
+        std::cout << "\n=== Executing " << p->getName() << " orders ===" << std::endl;
+
+        OrdersList* orders = p->getOrders();
+        if (!orders) continue;
+
+        // --- Step 1: Execute all Deploy Orders ---
+        for (int i = 0; i < orders->size(); ++i) {
+            Order* o = orders->getOrder(i);
+            if (!o) continue;
+
+            if (o->getDescription() == "Deploy Order") {
+                std::cout << "\n>>> Executing Deploy Order #" << i << std::endl;
+                o->execute();
+            }
+        }
+
+        // --- Step 2: Execute all non-Deploy Orders ---
+        for (int i = 0; i < orders->size(); ++i) {
+            Order* o = orders->getOrder(i);
+            if (!o) continue;
+
+            if (o->getDescription() != "Deploy Order") {
+                std::cout << "\n>>> Executing Non-Deploy Order #" << i << std::endl;
+                o->execute();
+            }
+        }
+
+        // --- Step 3: Cleanup (remove all executed orders safely) ---
+        while (orders->size() > 0) {
+            orders->removeOrder(0);
         }
     }
 
-    std::vector<Player*>* playersLeft = new std::vector<Player*>();
-    for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
-        Player* p = *pIt;
+    auto it = players_->begin();
+    while(it != players_->end()){
+        Player* p = *it;
         if (p->getTerritories()->empty()) {
             std::cout << "\n=== " << p->getName() << " is out of the game! (No territories left) ===" << std::endl;
-            continue;
+            delete p;
+            it = players_->erase(it);
+        }else{
+            ++it;
         }
-        playersLeft->push_back(p);
     }
-    delete players_;
-    players_ = playersLeft;
 };
 
 void GameEngine::mainGameLoop(){
@@ -496,7 +527,7 @@ void GameEngine::assignTerritoriesRoundRobin() {
     Territory* toAdd = territories[t->getEdges()[idxT++]];
 
     for (auto* p : players) {
-        while(p->toDefend().size() < (nTerritories / nPlayers) && !assigned){  
+        while(p->toDefend().size() < (nTerritories / nPlayers) && !assigned){
             if(idxT >= t->getEdges().size()){
                 t = toAdd;
                 idxT=0;
@@ -532,8 +563,8 @@ void GameEngine::startupPhase() {
         std::istringstream iss(line);
         std::getline(iss, cmd, ' ');
         std::getline(iss, arg);
-        this->handleCommand(cmd, arg); 
+        this->handleCommand(cmd, arg);
     }
-    
+
 }
 

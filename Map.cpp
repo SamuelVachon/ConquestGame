@@ -22,6 +22,7 @@ Continent::Continent(Continent* continent){
     this->name = continent->name;
     this->number = continent->number;
     this->territoriesIndex = continent->territoriesIndex;
+    this->territories = continent->territories;
 }
 
 void Continent::setName(std::string& name){
@@ -298,7 +299,6 @@ Map::~Map(){
     }
     this->territories.clear();
     this->continents.clear();
-
 };
 
 void Map::setAuthor(std::string& author){

@@ -6,6 +6,7 @@
 #include <random>
 #include "Player.h"
 #include "Orders.h"
+#include "Map.h"
 
 using namespace std;
 /**
@@ -56,13 +57,16 @@ Order* Card::createOrder(Player* player){
         case CardType::Bomb:
             return new BombOrder(player, player->toAttack().front());
         case CardType::Reinforcement:
-            return new DeployOrder(player,player->toDefend().front(),2);
+            return new DeployOrder(player,player->toDefend().front(),5);
         case CardType::Blockade:
             return new BlockadeOrder(player, player->toDefend().front());
         case CardType::Airlift:
-            return new AirliftOrder(player, player->toDefend().front(), player->toAttack().front(), 2);
+            return new AirliftOrder(player, player->toDefend().front(), player->toAttack().front(), 5);
         case CardType::Diplomacy:
-            return new NegotiateOrder(player, nullptr);
+            {
+            Territory* adversary = player->toAttack().front();
+            return new NegotiateOrder(player, adversary->getPlayer());
+            }
         default:
             return nullptr;
     }
@@ -77,6 +81,7 @@ void Card::play(Player* player, Deck* deck){
     }
     std::cout << player->getName() << " plays " << getTypeAsString() << " card.\n";
     player->addOrder(createOrder(player));
+    player->getHand()->removeCard(this);
     deck->returnCard(this);
 }
 
