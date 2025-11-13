@@ -17,6 +17,7 @@ void testStartupPhase() {
     std::cout << "=== testStartupPhase() ===\n";
     engine.startupPhase();
     std::cout << "Startup phase complete.\n";
+    
 }
 
 

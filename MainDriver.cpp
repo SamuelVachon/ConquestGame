@@ -9,6 +9,7 @@ extern void testOrdersLists();
 extern void testMainGameLoop();
 extern void testOrderExecution();
 extern void testGameStates();
+extern void testStartupPhase();
 // Run interactive console mode
 static int runConsole() {
     CommandProcessor cp;
@@ -74,8 +75,7 @@ int main(int argc, char** argv) {
             testMainGameLoop();
         }
         if (arg1 == "--startup"){
-            GameEngine* ge = new GameEngine();
-            ge->startupPhase();
+            testStartupPhase();
             return 0;
         }
 

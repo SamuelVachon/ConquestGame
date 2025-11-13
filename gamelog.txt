@@ -1,0 +1,5 @@
+Command:  loadmap world.map
+Effect:  map loaded
+[GameEngine] state -> maploaded
+ORDER-ADDED Ping
+ORDER-EXECUTED Ping :: executed ok

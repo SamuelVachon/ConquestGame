@@ -516,35 +516,35 @@ void GameEngine::assignTerritoriesRoundRobin() {
     if (territories.empty()) return;
 
     size_t idxT =0;
+    size_t idxTerr =1;
+    size_t idxP =1;
     size_t nTerritories = territories.size();
     size_t nPlayers = players_->size();
     Territory* t = territories[0];
     Territory* temp;
+    Territory* temp2;
+    Territory* temp3;
     std::vector<Player*> players = *players_;
     bool assigned = false;
 
     players[0]->addTerritory(t); // first territory to first player
     Territory* toAdd = territories[t->getEdges()[idxT++]];
+    temp2 = toAdd;
 
     for (auto* p : players) {
-        while(p->toDefend().size() < (nTerritories / nPlayers) && !assigned){
-            if(idxT >= t->getEdges().size()){
-                t = toAdd;
-                idxT=0;
-            }
-            temp = territories[t->getEdges()[idxT++]];
-            if(temp->getPlayer() == nullptr){
-                p->addTerritory(toAdd);
-                toAdd = temp;
-            }
-            for(auto* terr : territories){
+        for(auto* terr : territories){  
+            while(p->toDefend().size() <= ((nTerritories / nPlayers)*idxP)){
                 if(terr->getPlayer() == nullptr){
-                    assigned = false;
-                    continue;
+                    p->addTerritory(terr);
                 }
-                assigned = true;
+                idxTerr++;
+                if (idxTerr >= nTerritories-1){
+                    break;
+                }
             }
         }
+        idxTerr=1;
+        idxP++;
     }
 }
 
@@ -564,6 +564,10 @@ void GameEngine::startupPhase() {
         std::getline(iss, cmd, ' ');
         std::getline(iss, arg);
         this->handleCommand(cmd, arg);
+    }
+    std::cout << map_ << std::endl;
+    for (auto* p : *players_) {
+        std::cout << *p << std::endl;
     }
 
 }
