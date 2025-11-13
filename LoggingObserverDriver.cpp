@@ -63,7 +63,6 @@ void testLoggingObserver() {
     ol.addOrder(po);                                     // -> ORDER-ADDED Ping
 
     // (6) Trigger ORDER-EXECUTED via Order::execute()
-    //     (your real orders already call notify() inside execute(); our PingOrder does too)
     po->execute();                                       // -> ORDER-EXECUTED Ping :: executed ok
 
     // (7) Clean up
