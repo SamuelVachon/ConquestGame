@@ -68,9 +68,6 @@ void testLoggingObserver() {
 
     // (7) Clean up
     delete logger;
-    // note: ol owns only pointers you add if your design says so; if not, delete po if needed
-    // If OrdersList does NOT delete orders, uncomment the next line:
-    // delete po;
 
     std::cout << "[Part 5] Logging demo done. gamelog.txt for COMMAND/EFFECT/STATE/ORDER lines has been created.\n";
 }
