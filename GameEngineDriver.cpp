@@ -12,6 +12,13 @@ void testGameStates() {
     engine.runConsole();
 }
 
+void testStartupPhase() {
+    GameEngine engine;
+    std::cout << "=== testStartupPhase() ===\n";
+    engine.startupPhase();
+    std::cout << "Startup phase complete.\n";
+}
+
 
 /**
  * testMainGameLoop()
@@ -48,7 +55,7 @@ void testMainGameLoop() {
     Territory* C = new Territory(c, 0, 1, 1);
     Territory* D = new Territory(d, 1, 1, 1);
 
-    // Adjacency setup: A–B–C–D chain
+    // Adjacency setup: Aï¿½Bï¿½Cï¿½D chain
     A->addAdjacentTerritory(B);
     A->addAdjacentTerritory(C);
     B->addAdjacentTerritory(A);

@@ -8,6 +8,7 @@ extern void testCommandProcessor();
 extern void testOrdersLists();
 extern void testMainGameLoop();
 extern void testOrderExecution();
+extern void testGameStates();
 // Run interactive console mode
 static int runConsole() {
     CommandProcessor cp;
@@ -51,6 +52,7 @@ int main(int argc, char** argv) {
             testOrderExecution();
             testOrdersLists();
             testMainGameLoop();
+            testStartupPhase();
             return 0;
         }
 
