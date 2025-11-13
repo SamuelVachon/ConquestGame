@@ -8,7 +8,8 @@
 class Territory;     // from Map (forward-declared only)
 class Hand;          // from Card.h (teammate)
 class OrdersList;    // defined in our Orders.{h,cpp}
-class Order;
+class Order;         // defined in our Orders.{h,cpp}
+class Deck;          // from Card.h
 
 void testPlayers();
 
@@ -23,14 +24,26 @@ public:
     ~Player();                               // destructor (release dynamic memory)
     Player& operator=(const Player& other);  // copy assignment operator
 
-    const std::string& getName() const; // return player name 
-// returns list of territories owned and to attack
+    const std::string& getName() const; // return player name
+
+    // returns list of territories owned and to attack
     std::vector<Territory*> toDefend() const;
     std::vector<Territory*> toAttack() const;
     void issueOrder();                       // creates an Order and adds to list
 
     // Driver helpers
     void addTerritory(Territory* t);         // Player does NOT own Territory*
+    std::vector<Territory*>* getTerritories();
+
+    // ====== A2 Part 3 add-ons ======
+
+    //Related to main game loop
+    void issueOrder(Deck* deck);
+    bool isDoneIssuing() const;
+    bool hasOrders() const;
+    void addOrder(Order* order);
+    Order* nextOrder();
+
     void setHand(Hand* h);                   // takes ownership of Hand*
     OrdersList* getOrders() const;           // non-owning access
 
@@ -40,9 +53,14 @@ public:
     // ====== A2 Part 4 Additions ======
 
     // Reinforcement pool
-    void addReinforcements(int n);
-    bool spendReinforcements(int n);
+    void addDeployableUnits(int n);
+    bool spendDeployableUnits(int n);
     int reinforcementPool() const;
+
+    //Helper related
+    void addReinforcements(int n);
+    void setReinforcements(int n);
+    int getDeployableUnits();
 
     // Turn/conquest flags
     void markConquered();
@@ -54,22 +72,25 @@ public:
     bool hasTruceWith(Player* p) const;
 
     // Hand getter
-    Hand* getHand() const;      
+    Hand* getHand() const;
 
 private:
     // Per assignment: user-defined members as pointer types
-    std::string* name_;   
+    std::string* name_;
     std::vector<Territory*>* terrs_;
     Hand*        hand_;
     OrdersList*  orders_;
-    int reinforcemtnts_;
+    //to avoid conflicts with orders using reinforcements
+    int deployableUnits;
+    bool doneIssuing_;
+    // ====== A2 Part 4 Fields ======
+    int reinforcements_;
+    bool conqueredThisTurn_ = false;
+    std::vector<Player*> negotiated_;
 
-// Internal helper
+    // Internal helper
     void deepCopyFrom(const Player& other); // deep copy used in copy constructor
 
-// ====== A2 Part 4 Fields ======
-int reinforce_ = 0;
-bool conqueredThisTurn_ = false;
-std::vector<Player*> negotiated_;
+
 };
 

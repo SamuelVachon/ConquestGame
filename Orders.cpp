@@ -21,7 +21,7 @@
     return target;
  };
 
- // Setters 
+ // Setters
  void Order::setDescription(const string& description){
     if(this->description){
         delete this->description;
@@ -182,7 +182,7 @@ if (getTarget() == nullptr) {
 }
 
 // Ownership check player must actually own the target territory
-    
+
     Player* issuer = getIssuer();
     Territory* target = getTarget();
 
@@ -212,7 +212,7 @@ if (*numArmies <= 0) {
 void DeployOrder::execute() {
     cout << "\n[Executing Deploy Order...]\n";
     if (!validate()) {
-        setEffect("Invalid order — deployment failed.");
+        setEffect("Invalid order - deployment failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition
         return;
@@ -221,7 +221,7 @@ void DeployOrder::execute() {
     Player* p = getIssuer();
     Territory* t = getTarget();
 
-    if (!p->spendReinforcements(*numArmies)) {
+    if (!p->spendDeployableUnits(*numArmies)) {
         setEffect("Invalid: not enough armies in reinforcement pool.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition
@@ -416,7 +416,7 @@ bool AdvanceOrder::validate() {
 void AdvanceOrder::execute() {
     cout << "\n[Executing Advance Order...]\n";
     if (!validate()) {
-        setEffect("Invalid order — advance failed.");
+        setEffect("Invalid order - advance failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
@@ -591,7 +591,7 @@ void BombOrder::execute() {
     cout << "\n[Executing Bomb Order...]\n";
 
     if (!validate()) {
-        setEffect("Invalid order — bombing failed.");
+        setEffect("Invalid order - bombing failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
@@ -696,7 +696,7 @@ bool BlockadeOrder::validate() {
 
     if (!ownsTarget) {
         cout << "Invalid: Player " << issuer->getName()
-             << " does not own the target territory " 
+             << " does not own the target territory "
              << target->getName() << ".\n";
         return false;
     }
@@ -712,7 +712,7 @@ static Player* getNeutralPlayer() {
 void BlockadeOrder::execute() {
     cout << "\n[Executing Blockade Order...]\n";
     if (!validate()) {
-        setEffect("Invalid order — blockade failed.");
+        setEffect("Invalid order - blockade failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
@@ -892,7 +892,7 @@ void AirliftOrder::execute() {
     cout << "\n[Executing Airlift Order...]\n";
 
     if (!validate()) {
-        setEffect("Invalid order — airlift failed.");
+        setEffect("Invalid order - airlift failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
@@ -1025,7 +1025,7 @@ bool NegotiateOrder::validate() {
 void NegotiateOrder::execute() {
     cout << "\n[Executing Negotiate Order...]\n";
     if (!validate()) {
-        setEffect("Invalid order — negotiation failed.");
+        setEffect("Invalid order - negotiation failed.");
         cout << getEffect() << endl;
         notify();                    // Part 5 addition (assign 2)
         return;
@@ -1082,7 +1082,7 @@ OrdersList::OrdersList() {
 OrdersList::OrdersList(const OrdersList& other) {
     this->orders = new vector<Order*>();
     for (Order* o : *other.orders) {
-        this->orders->push_back(o); 
+        this->orders->push_back(o);
     }
 };
 
@@ -1099,7 +1099,7 @@ OrdersList& OrdersList::operator=(const OrdersList& other) {
 
     // Deep copy new ones
     for (Order* o : *other.orders) {
-        orders->push_back(o); 
+        orders->push_back(o);
     }
 
     return *this;
@@ -1169,7 +1169,7 @@ void OrdersList::moveOrder(int fromIndex, int toIndex) {
     orders->erase(orders->begin() + fromIndex);
     orders->insert(orders->begin() + toIndex, temp);
 
-    cout << "Order moved from index " << fromIndex 
+    cout << "Order moved from index " << fromIndex
          << " to " << toIndex << ".\n";
 };
 

@@ -11,6 +11,9 @@ class MapLoader;
 class Player;
 class Deck;
 
+void testGameStates();
+void testMainGameLoop();
+
 class GameEngine : public Subject, public ILoggable {  // loggable subject
 public:
     enum class State {
@@ -33,13 +36,12 @@ public:
 
     // ===== Top-level loop
     void runConsole();
-
+    void startupPhase();
     // ===== State helpers
     State getState() const;
     std::string stateName() const;
-    void transition(State newState);                
-    std::string stringToLog() const override; 
-    void startupPhase();      
+    void transition(State newState);
+    std::string stringToLog() const override;
 
     // ===== Commands / FSM
     bool handleCommand(const std::string& cmd, const std::string& arg);
@@ -56,6 +58,15 @@ public:
     bool cmd_win();
     bool cmd_end();
 
+    //Related to the main game loop
+    void reinforcementPhase();
+    void issueOrdersPhase();
+    void executeOrdersPhase();
+    void mainGameLoop();
+
+    //Driver
+    //Need friend to access private fields
+    friend void testMainGameLoop();
     // ===== Helpers
     void resetMapAndCountries();
     void assignTerritoriesRoundRobin();
@@ -76,5 +87,5 @@ private:
     void clearAll();
 };
 
-#endif 
+#endif
 

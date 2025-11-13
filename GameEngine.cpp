@@ -297,14 +297,14 @@ bool GameEngine::cmd_gamestart() {
         std::cout << "You must assign countries first.\n";
         return false;
     }
-    
+
     deck_ = new Deck(52); // create a new deck for the game
 
     for (auto* p : *players_) {
         Hand* hand = new Hand();
         hand->addCard(deck_->draw());
         hand->addCard(deck_->draw());
-        p->setHand(hand);      
+        p->setHand(hand);
     }
 
     std::random_device rd;
@@ -381,6 +381,126 @@ bool GameEngine::cmd_end() {
 }
 
 // ============================
+//        GAME LOOP
+// ============================
+void GameEngine::reinforcementPhase(){
+    std::cout << "\n=== Reinforcement Phase ===" << std::endl;
+    for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
+        Player* p = *pIt;
+
+        // base reinforcement = max(3, number of territories / 3)
+        int terrCount = static_cast<int>(p->getTerritories()->size());
+        int baseReinforcements = std::max(3, terrCount / 3);
+
+        int bonus = 0;
+
+        // check continents for ownership
+        //Bonus is decided by wether player owns ALL the territories in it's continent
+        std::vector<Continent*> continents = map_->getContinents();
+        for (auto cIt = continents.begin(); cIt != continents.end(); ++cIt) {
+            Continent* c = *cIt;
+            bool ownsAll = true;
+
+            std::vector<Territory*> territories = c->getTerritoriesPtr();
+            for (auto tIt = territories.begin(); tIt != territories.end(); ++tIt) {
+                Territory* t = *tIt;
+                if (t->getPlayer() != p) {
+                    ownsAll = false;
+                    break;
+                }
+            }
+            if (ownsAll) {
+                //Number is bonus value(visible in any .map file)
+                bonus += c->getNumber();
+            }
+        }
+        int total = baseReinforcements + bonus;
+        p->addReinforcements(total);
+        std::cout << p->getName() << " receives " << total << " armies." << std::endl;
+    }
+};
+
+void GameEngine::issueOrdersPhase(){
+    std::cout << "\n=== Issuing Orders ===" << std::endl;
+    int countDoneIssuing = 0;
+    while(countDoneIssuing != players_->size()){
+        for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
+            Player* p = *pIt;
+            if (!p->isDoneIssuing()) {
+                p->issueOrder(deck_);
+            }else{
+                countDoneIssuing++;
+            }
+        }
+    }
+};
+
+void GameEngine::executeOrdersPhase(){
+    std::cout << "\n=== Executing Orders ===" << std::endl;
+    for (auto pIt = players_->begin(); pIt != players_->end(); ++pIt) {
+        Player* p = *pIt;
+        std::cout << "\n=== Executing " << p->getName() << " orders ===" << std::endl;
+
+        OrdersList* orders = p->getOrders();
+        if (!orders) continue;
+
+        // --- Step 1: Execute all Deploy Orders ---
+        for (int i = 0; i < orders->size(); ++i) {
+            Order* o = orders->getOrder(i);
+            if (!o) continue;
+
+            if (o->getDescription() == "Deploy Order") {
+                std::cout << "\n>>> Executing Deploy Order #" << i << std::endl;
+                o->execute();
+            }
+        }
+
+        // --- Step 2: Execute all non-Deploy Orders ---
+        for (int i = 0; i < orders->size(); ++i) {
+            Order* o = orders->getOrder(i);
+            if (!o) continue;
+
+            if (o->getDescription() != "Deploy Order") {
+                std::cout << "\n>>> Executing Non-Deploy Order #" << i << std::endl;
+                o->execute();
+            }
+        }
+
+        // --- Step 3: Cleanup (remove all executed orders safely) ---
+        while (orders->size() > 0) {
+            orders->removeOrder(0);
+        }
+    }
+
+    auto it = players_->begin();
+    while(it != players_->end()){
+        Player* p = *it;
+        if (p->getTerritories()->empty()) {
+            std::cout << "\n=== " << p->getName() << " is out of the game! (No territories left) ===" << std::endl;
+            delete p;
+            it = players_->erase(it);
+        }else{
+            ++it;
+        }
+    }
+};
+
+void GameEngine::mainGameLoop(){
+    std::cout << "\n=== Starting the game... ===" << std::endl;
+
+    if(players_->size()>1){
+        reinforcementPhase();
+        issueOrdersPhase();
+        executeOrdersPhase();
+    }
+    std::cout << "\n=== GAME OVER! ===" << std::endl;
+    if(!players_->empty()){
+        std::cout << "Winner: " << players_->front()->getName() << std::endl;
+    }
+};
+
+
+// ============================
 //        HELPER METHODS
 // ============================
 
@@ -407,7 +527,7 @@ void GameEngine::assignTerritoriesRoundRobin() {
     Territory* toAdd = territories[t->getEdges()[idxT++]];
 
     for (auto* p : players) {
-        while(p->toDefend().size() < (nTerritories / nPlayers) && !assigned){  
+        while(p->toDefend().size() < (nTerritories / nPlayers) && !assigned){
             if(idxT >= t->getEdges().size()){
                 t = toAdd;
                 idxT=0;
@@ -443,8 +563,8 @@ void GameEngine::startupPhase() {
         std::istringstream iss(line);
         std::getline(iss, cmd, ' ');
         std::getline(iss, arg);
-        this->handleCommand(cmd, arg); 
+        this->handleCommand(cmd, arg);
     }
-    
+
 }
 

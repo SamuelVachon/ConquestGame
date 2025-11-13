@@ -10,16 +10,19 @@ std::vector<int> territoriesIndex; -> represent the index in the map object terr
 Continent::Continent(std::string& tempName, int tempNumber){
     this->name = tempName;
     this->number = tempNumber;
+    this->territories = std::vector<Territory*>();
 }
 
 Continent::~Continent(){
     this->territoriesIndex.clear();
+    this->territories.clear(); //Don't delete since Map still owns the territories
 };
 
 Continent::Continent(Continent* continent){
     this->name = continent->name;
     this->number = continent->number;
     this->territoriesIndex = continent->territoriesIndex;
+    this->territories = continent->territories;
 }
 
 void Continent::setName(std::string& name){
@@ -60,11 +63,22 @@ bool Continent::validate(Map* map, int index){
 std::string Continent::getName(){
     return this->name;
 }
+//This is the bonus value when Player captures all territories of a continent
 int Continent::getNumber(){
     return this->number;
 }
 std::vector<int> Continent::getTerritories(){
     return this->territoriesIndex;
+}
+
+// Issue #27 add a Territory* reference directly
+void Continent::addTerritoryPtr(Territory* terr) {
+    this->territories.push_back(terr);
+}
+
+// Issue #27 getter for pointer-based territory list
+std::vector<Territory*> Continent::getTerritoriesPtr() {
+    return this->territories;
 }
 
 std::ostream& operator<<(std::ostream& os, const Continent& c){
@@ -94,6 +108,8 @@ Territory::Territory(std::string& tempName, int tempx, int tempy, int tempContin
     this->army = 0;
     this->continent = tempContinent;
     this->player = nullptr;
+    this->continentPtr = nullptr;
+    this->adjacentTerritories_ = std::vector<Territory*>();
 };
 
 Territory::Territory(Territory* territory){
@@ -105,11 +121,15 @@ Territory::Territory(Territory* territory){
     this->continentIndex = territory->continentIndex;
     this->edgesIndex = territory->edgesIndex;
     this->player = territory->player;
+    this->adjacentTerritories_ = territory->adjacentTerritories_;
+    this->continentPtr = territory->continentPtr;
 }
 
 Territory::~Territory(){
     this->edgesIndex.clear();
     this->edgesNames.clear();
+    this->adjacentTerritories_.clear();
+    this->continentPtr = nullptr; //Don't delete since Map still owns the continent
 };
 
 void Territory::setName(std::string& name){
@@ -130,12 +150,21 @@ void Territory::setArmy(int army){
 void Territory::setPlayer(Player* player){
     this->player=player;
 }
+// Issue #27 sets the continent pointer reference
+void Territory::setContinentPtr(Continent* continent) {
+    this->continentPtr = continent;
+}
+
 void Territory::addEdges(int i){
     this->edgesIndex.push_back(i);
 }
 void Territory::addEdgesNames(std::string& name){
     this->edgesNames.push_back(name);
 }
+void Territory::addAdjacentTerritory(Territory* terr){
+    this->adjacentTerritories_.push_back(terr);
+}
+
 
 //Helper method for the validate function of the Class map, this function set the value of
 //the isConnected attribute to true for all territories that can be reached stating from
@@ -201,6 +230,14 @@ std::vector<int> Territory::getEdges(){
 std::vector<std::string> Territory::getEdgesNames(){
     return this->edgesNames;
 }
+std::vector<Territory*> Territory::getAdjacentTerritories(){
+    return this->adjacentTerritories_;
+}
+
+// Issue #27 gets the continent pointer reference
+Continent* Territory::getContinentPtr() {
+    return this->continentPtr;
+}
 int Territory::getContinent(){
     return this->continent;
 }
@@ -262,7 +299,6 @@ Map::~Map(){
     }
     this->territories.clear();
     this->continents.clear();
-
 };
 
 void Map::setAuthor(std::string& author){
@@ -350,6 +386,7 @@ void Map::setTerritoriesEdges(){
                 tempName = territories[i]->getName();
                 if(name.compare(tempName) == 0){
                     territory->addEdges(i);
+                    territory->addAdjacentTerritory(territories[i]);
                     break;
                 }
             }
@@ -362,7 +399,14 @@ void Map::setTerritoriesEdges(){
 void Map::setContinentsTerritories(){
     int size = this->territories.size();
     for(int i=0;i<size;i++){
-        this->continents[this->territories[i]->getContinent()]->addTerritory(i);
+        //get the index
+        int idx = this->territories[i]->getContinent();
+        //Not replacing previous int territory, still used in parts of the code
+        this->continents[idx]->addTerritory(i);
+        //Connection between territories (Contains all references to terr inside it)
+        this->continents[idx]->addTerritoryPtr(this->territories[i]);
+        //Connection between continent (Contains reference to it)
+        this->territories[i]->setContinentPtr(this->continents[idx]);
     }
 }
 

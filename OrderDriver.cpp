@@ -25,7 +25,7 @@ void testOrdersLists() {
     string t3Name = "Manitoba";
     string t4Name = "Alberta";
 
-  
+
 
     Territory* t1 = new Territory(t1Name, 0, 0, 1);
     Territory* t2 = new Territory(t2Name, 0, 0, 1);
@@ -158,8 +158,8 @@ void testOrderExecution() {
     p2->addTerritory(D);
 
     // Reinforcement pools & hands
-    p1->addReinforcements(10);
-    p2->addReinforcements(5);
+    p1->addDeployableUnits(10);
+    p2->addDeployableUnits(5);
     p1->setHand(new Hand());
     p2->setHand(new Hand());
 
@@ -293,6 +293,4 @@ void testOrderExecution() {
     delete p1; delete p2;
 
     cout << "===== end testOrderExecution() =====\n";
-}
-
 }

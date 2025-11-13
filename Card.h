@@ -5,9 +5,11 @@
     using std::string;
 #include <vector>
     using std::vector;
+
 class Player;
 class Deck;
 class Hand;
+class Order;
 
 void testCards();
 
@@ -22,6 +24,7 @@ enum class CardType{
 class Card{
     private:
         CardType type;
+        Order* createOrder(Player* player);
     public:
         Card(CardType type);
         ~Card();

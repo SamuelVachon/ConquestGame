@@ -27,6 +27,7 @@ class Continent{
     void setName(std::string& name);
     void setNumber(int number);
     void addTerritory(int territory);
+    void addTerritoryPtr(Territory* terr);
     bool compare(Continent* continent);
     bool validate(Map* map, int index);
 
@@ -34,6 +35,7 @@ class Continent{
     std::string getName();
     int getNumber();
     std::vector<int> getTerritories();
+    std::vector<Territory*> getTerritoriesPtr();
 
     friend std::ostream& operator<<(std::ostream& os, const Continent& c);
 
@@ -44,6 +46,7 @@ class Continent{
 
     int number;
     std::vector<int> territoriesIndex;
+    std::vector<Territory*> territories;
 };
 
 class Territory{
@@ -58,8 +61,10 @@ class Territory{
     void setIsConnected(bool isConnected);
     void setArmy(int army);
     void setPlayer(Player* player);
+    void setContinentPtr(Continent* continent);
     void addEdges(int i);
     void addEdgesNames(std::string& name);
+    void addAdjacentTerritory(Territory* terr);
     void setConnectedtoTrue(Map* map);
     void setConnectedtoTrue(Map* map, int continentIndex);
 
@@ -69,13 +74,15 @@ class Territory{
 
     std::vector<int> getEdges();
     std::vector<std::string> getEdgesNames();
+    std::vector<Territory*> getAdjacentTerritories();
     int getContinent();
+    Continent* getContinentPtr();
     bool getIsConnected();
     int getArmy();
     Player* getPlayer();
 
     friend std::ostream& operator<<(std::ostream& os,const Territory& t);
-    
+
 
 
     private:
@@ -84,13 +91,15 @@ class Territory{
     int x;
     int y;
     std::vector<int> edgesIndex;
+    std::vector<Territory*> adjacentTerritories_;
     int continentIndex;
     bool isConnected;
     int army;
     int continent;
+    Continent* continentPtr;
     Player* player;
     std::vector<std::string> edgesNames;
-    
+
 };
 
 

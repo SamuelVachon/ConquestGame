@@ -2,7 +2,7 @@
 #ifndef ORDERS_H
 #define ORDERS_H
 
-#include "LoggingObserver.h"   
+#include "LoggingObserver.h"
 #include <string>
 #include <iostream>
 using namespace std;

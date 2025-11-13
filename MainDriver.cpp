@@ -1,20 +1,21 @@
 #include "CommandProcessing.h"
 #include <iostream>
 #include <string>
+#include "GameEngine.h"
 
 extern void testLoggingObserver();    // from LoggingObserverDriver.cpp
-extern void testCommandProcessor(); 
+extern void testCommandProcessor();
 extern void testOrdersLists();
+extern void testMainGameLoop();
 extern void testOrderExecution();
-extern void startupPhase();
 // Run interactive console mode
 static int runConsole() {
     CommandProcessor cp;
     std::cout << "[mode] console (type :q to exit)\n";
     while (true) {
         Command* c = cp.getCommand();
-        if (!c) break;           
-        std::cout << *c << "\n"; 
+        if (!c) break;
+        std::cout << *c << "\n";
         if (cp.getState() == GameState::ExitProgram) break;
     }
     return 0;
@@ -26,8 +27,8 @@ static int runFile(const std::string& path) {
     std::cout << "[mode] file: " << path << "\n";
     while (true) {
         Command* c = fcp.getCommand();
-        if (!c) break;           
-        std::cout << *c << "\n"; 
+        if (!c) break;
+        std::cout << *c << "\n";
         if (fcp.getState() == GameState::ExitProgram) break;
     }
     return 0;
@@ -47,6 +48,9 @@ int main(int argc, char** argv) {
         if (arg1 == "--test") {
             testCommandProcessor();
             testLoggingObserver();
+            testOrderExecution();
+            testOrdersLists();
+            testMainGameLoop();
             return 0;
         }
 
@@ -64,8 +68,12 @@ int main(int argc, char** argv) {
             testOrderExecution();
             return 0;
         }
+        if (arg1 == "--main-game"){
+            testMainGameLoop();
+        }
         if (arg1 == "--startup"){
-            startupPhase();
+            GameEngine* ge = new GameEngine();
+            ge->startupPhase();
             return 0;
         }
 
@@ -83,7 +91,9 @@ int main(int argc, char** argv) {
     testLoggingObserver();
     testOrdersLists();
     testOrderExecution();
-    startupPhase();
+    testMainGameLoop();
+    GameEngine* ge = new GameEngine();
+    ge->startupPhase();
     return 0;
 }
 
