@@ -17,7 +17,7 @@ void testGameStates() {
  * testMainGameLoop()
  * Demonstrates:
  * (1) Reinforcement calculation
- * (2) Deploy-only orders until reinforcement pool = 0
+ * (2) Deploy orders until reinforcement pool = 0
  * (3) Advance orders (attack/defend)
  * (4) Playing cards to issue orders
  * (5) Player removal when no territories left
@@ -115,9 +115,6 @@ void testMainGameLoop() {
 
     std::cout << p1->getName() << " reinforcement pool: " << p1->reinforcementPool() << std::endl;
     std::cout << p2->getName() << " reinforcement pool: " << p2->reinforcementPool() << std::endl;
-    // ====== SIMULATE REINFORCEMENT SPENT ======
-//    p1->setReinforcements(0);
-//    p2->setReinforcements(0);
 
     // ====== (3) ADVANCE ORDERS (ATTACK / DEFEND) ======
     std::cout << "\n(3) Testing Issue Orders Phase (Advance Orders)...\n";
