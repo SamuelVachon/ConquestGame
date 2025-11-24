@@ -1,0 +1,5 @@
+validatemap
+loadmap earth.map
+gamestart
+addplayer Charlie
+addplayer Dana
