@@ -66,57 +66,144 @@ std::vector<Territory*> HumanPlayerStrategy::toAttack() {
     return targets;
 }
 
-void HumanPlayerStrategy::issueOrder(Deck* deck) {
-    // This is basically your old Player::issueOrder(Deck*) behaviour,
-    // just moved here. :contentReference[oaicite:2]{index=2}
+void HumanPlayerStrategy::issueOrder(Deck* deck){
 
-    if (player_->reinforcementPool() > 0) {
-    auto defendList = toDefend();
-    Territory* target = defendList.empty() ? nullptr : defendList.front();
-    if (target) {
-        int deployCount = std::min(3, player_->reinforcementPool());
+    //Allow the user to make choices
+    char choice = 'a';
 
-        // Spend from the pool using your existing API
-        if (player_->spendReinforcements(deployCount)) {
-            player_->getOrders()->addOrder(
-                new DeployOrder(player_, target, deployCount)
-            );
+    while (choice != 'n' && choice != 'y'){
+        std::cout << "Do you want to deploy reinforcements? (y/n): ";
+        std::cin >> choice;
+    }
 
-            std::cout << player_->getName() << " [Human] Deploy "
-                      << deployCount << " to " << target->getName() << "\n";
+    if (player_->reinforcementPool() > 0 && choice == 'y'){
+        auto defendList = toDefend();
+        
+        for(Territory* t : defendList){
+            if(player_->reinforcementPool() <= 0){
+                std::cout << "No more reinforcements left to deploy.\n";
+                break;
+            }
+
+            std::cout << *t << std::endl;
+            
+            choice = 'a';
+
+            while (choice != 'n' && choice != 'y'){
+                std::cout << "Do you want to deploy to " << t->getName() << "? (y/n): ";
+                std::cin >> choice;
+            }
+
+            if(choice == 'n'){
+                std::cout << "Do you want to continue deploying? (y/n): ";
+                std::cin >> choice;
+                if(choice == 'n'){
+                    break;
+                }
+                continue;
+            }
+            else{
+                while(true){
+                    std::cout << "You have " << player_->reinforcementPool() << " reinforcements left.\n";
+                    int num;
+
+                    std::cout << "Enter number of reinforcements to deploy to " << t->getName() << ": ";
+                    std::cin >> num;
+                    if(num > player_->reinforcementPool() || num <= 0){
+                        std::cout << "Invalid number of reinforcements. Try again next time.\n";
+                        continue;
+                    }
+
+                    player_->addOrder(new DeployOrder(player_, t, num));
+                    player_->spendReinforcements(num);
+                    break;
+                }         
+            }
         }
     }
-    return;
-}
 
     bool canAttack = !toAttack().empty();
-    bool canDefend = toDefend().size() > 1;
-
-    if (canDefend) {
-        auto defendList = toDefend();
-        Territory* src = defendList.back();
-        Territory* tgt = defendList.front();
-        player_->getOrders()->addOrder(new AdvanceOrder(player_, src, tgt, 2));
-        std::cout << player_->getName()
-                  << " [Human] Defensive Advance " << src->getName()
-                  << " -> " << tgt->getName() << "\n";
-    }
 
     if (canAttack) {
-        auto defendList = toDefend();
-        auto attackList = toAttack();
-        if (!defendList.empty() && !attackList.empty()) {
-            Territory* src = defendList.front();
-            Territory* tgt = attackList.front();
-            player_->getOrders()->addOrder(new AdvanceOrder(player_, src, tgt, 2));
-            std::cout << player_->getName()
-                      << " [Human] Attack " << src->getName()
-                      << " -> " << tgt->getName() << "\n";
+
+        choice = 'a';
+        while (choice != 'n' && choice != 'y'){
+            std::cout << "Do you want to advance your troops? (y/n): ";
+            std::cin >> choice;
+        }
+
+        if (choice == 'y'){
+            auto attackList = toAttack();
+            
+            for(Territory* t : attackList){
+
+                std::cout << *t << std::endl;
+                
+                choice = 'a';
+
+                while (choice != 'n' && choice != 'y'){
+                    std::cout << "Do you want to attack " << t->getName() << "? (y/n): ";
+                    std::cin >> choice;
+                }
+
+                if(choice == 'n'){
+                    std::cout << "Do you want to continue attacking? (y/n): ";
+                    std::cin >> choice;
+                    if(choice == 'n'){
+                        break;
+                    }
+                    continue;
+                }
+                else{
+                    
+                    std::cout << "Territories to attack from:\n";
+                    auto attackFrom = new std::vector<Territory*>();
+                    for (Territory* adj : t->getAdjacentTerritories()) {
+                        if (adj->getPlayer() == player_) {
+                            attackFrom->push_back(adj);
+                            std::cout << "[0] " << *adj << std::endl;
+                        }         
+                    }
+
+                    while(true){
+                        std::cout << "Select territory to attack from (index): ";
+                        size_t index;
+                        std::cin >> index;
+                        if(index >= attackFrom->size()){
+                            std::cout << "Invalid index." << std::endl;
+                            continue;
+                        }
+                        break;
+                    }
+
+                    Territory* fromTerritory = (*attackFrom)[index];
+
+                    player_->addOrder(new AdvanceOrder(player_, fromTerritory, t, fromTerritory->getArmy()));
+                }
+            }
         }
     }
 
     if (player_->getHand() && player_->getHand()->size() > 0) {
-        player_->getHand()->playCard(0, player_, deck);
+        //Display the cards the player can play
+        std::cout << "\n" << player_->getName() << "'s turn to issue orders.\n";
+        player_->getHand()->showCards();
+
+        
+
+
+        //Manually issuing the orders
+        while (choice != 'n' && choice != 'y'){
+            std::cout << "Do you want to play a card? (y/n): ";
+            std::cin >> choice;
+        }
+
+        if (choice == 'n'){
+            std::cout << "No card played this turn.\n";
+            return;
+        }else{
+            while(true){}
+        }
     }
 }
 

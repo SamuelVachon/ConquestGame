@@ -463,6 +463,11 @@ void AdvanceOrder::execute() {
         setEffect("Attack failed on " + tgt->getName() + " (defenders left: " + to_string(def) + ").");
     }
     cout << getEffect() << endl;
+
+    //Change the player type from neutral to aggresive if attacked
+    if (std::typeid(getTarget()->getPlayer()->getStrategy()) == typeid(NeutralPlayerStrategy)){
+        getTarget()->getPlayer()->setStrategy(new AggressivePlayerStrategy(getTarget()->getPlayer()));
+    }
     notify();                        // Part 5 addition (assign 2)
 }
 
@@ -607,6 +612,11 @@ void BombOrder::execute() {
               ": enemy armies reduced from " +
               to_string(originalArmies) + " to " + to_string(destroyedArmies) + ".");
     cout << getEffect() << endl;
+
+    //Change the player type from neutral to aggresive if attacked
+    if (std::typeid(getTarget()->getPlayer()->getStrategy()) == typeid(NeutralPlayerStrategy)){
+        getTarget()->getPlayer()->setStrategy(new AggressivePlayerStrategy(getTarget()->getPlayer()));
+    }
     notify();                        // Part 5 addition (assign 2)
 }
 
