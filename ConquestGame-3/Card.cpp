@@ -198,6 +198,9 @@ void Hand::removeCard(Card* card){
     Card* card = handCards[index];
 
     card->play(player, deck);
+
+    this->removeCard(card);
+    this->addCard(deck->draw());
  }
 
  //Only to be used at the start of coding WHEN THE PLAYER CLASS ISN'T yet available

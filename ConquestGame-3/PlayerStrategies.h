@@ -38,6 +38,10 @@ public:
     std::vector<Territory*> toDefend() override;
     std::vector<Territory*> toAttack() override;
     void issueOrder(Deck* deck) override;
+    void reinforcePhase();
+    void attackPhase();
+    void cardPhase(Deck* deck);
+    char choice(std::string& type);
 };
 
 class AggressivePlayerStrategy : public PlayerStrategy {

@@ -66,144 +66,162 @@ std::vector<Territory*> HumanPlayerStrategy::toAttack() {
     return targets;
 }
 
-void HumanPlayerStrategy::issueOrder(Deck* deck){
-
-    //Allow the user to make choices
+char HumanPlayerStrategy::choice(std::string type){
     char choice = 'a';
 
     while (choice != 'n' && choice != 'y'){
-        std::cout << "Do you want to deploy reinforcements? (y/n): ";
+        std::cout << type;
         std::cin >> choice;
+        if (choice != 'n' && choice != 'y'){
+                std::cout << "Invalid choice. Please enter 'y' or 'n'.\n";
+        }
     }
+    return choice;
+}
+
+void HumanPlayerStrategy::issueOrder(Deck* deck){
+
+    //Allow the user to make choices
+    char choice = this->choice("Do you want to deploy reinforcements? (y/n): ");
 
     if (player_->reinforcementPool() > 0 && choice == 'y'){
-        auto defendList = toDefend();
-        
-        for(Territory* t : defendList){
-            if(player_->reinforcementPool() <= 0){
-                std::cout << "No more reinforcements left to deploy.\n";
-                break;
-            }
-
-            std::cout << *t << std::endl;
-            
-            choice = 'a';
-
-            while (choice != 'n' && choice != 'y'){
-                std::cout << "Do you want to deploy to " << t->getName() << "? (y/n): ";
-                std::cin >> choice;
-            }
-
-            if(choice == 'n'){
-                std::cout << "Do you want to continue deploying? (y/n): ";
-                std::cin >> choice;
-                if(choice == 'n'){
-                    break;
-                }
-                continue;
-            }
-            else{
-                while(true){
-                    std::cout << "You have " << player_->reinforcementPool() << " reinforcements left.\n";
-                    int num;
-
-                    std::cout << "Enter number of reinforcements to deploy to " << t->getName() << ": ";
-                    std::cin >> num;
-                    if(num > player_->reinforcementPool() || num <= 0){
-                        std::cout << "Invalid number of reinforcements. Try again next time.\n";
-                        continue;
-                    }
-
-                    player_->addOrder(new DeployOrder(player_, t, num));
-                    player_->spendReinforcements(num);
-                    break;
-                }         
-            }
-        }
+        this->reinforcePhase();
     }
 
     bool canAttack = !toAttack().empty();
 
     if (canAttack) {
 
-        choice = 'a';
-        while (choice != 'n' && choice != 'y'){
-            std::cout << "Do you want to advance your troops? (y/n): ";
-            std::cin >> choice;
-        }
+        choice = this->choice("Do you want to issue attack orders? (y/n): ");
 
         if (choice == 'y'){
-            auto attackList = toAttack();
-            
-            for(Territory* t : attackList){
-
-                std::cout << *t << std::endl;
-                
-                choice = 'a';
-
-                while (choice != 'n' && choice != 'y'){
-                    std::cout << "Do you want to attack " << t->getName() << "? (y/n): ";
-                    std::cin >> choice;
-                }
-
-                if(choice == 'n'){
-                    std::cout << "Do you want to continue attacking? (y/n): ";
-                    std::cin >> choice;
-                    if(choice == 'n'){
-                        break;
-                    }
-                    continue;
-                }
-                else{
-                    
-                    std::cout << "Territories to attack from:\n";
-                    auto attackFrom = new std::vector<Territory*>();
-                    for (Territory* adj : t->getAdjacentTerritories()) {
-                        if (adj->getPlayer() == player_) {
-                            attackFrom->push_back(adj);
-                            std::cout << "[0] " << *adj << std::endl;
-                        }         
-                    }
-
-                    while(true){
-                        std::cout << "Select territory to attack from (index): ";
-                        size_t index;
-                        std::cin >> index;
-                        if(index >= attackFrom->size()){
-                            std::cout << "Invalid index." << std::endl;
-                            continue;
-                        }
-                        break;
-                    }
-
-                    Territory* fromTerritory = (*attackFrom)[index];
-
-                    player_->addOrder(new AdvanceOrder(player_, fromTerritory, t, fromTerritory->getArmy()));
-                }
-            }
+            this->attackPhase();
         }
     }
 
-    if (player_->getHand() && player_->getHand()->size() > 0) {
+    if (player_->getHand()->size() > 0) {
         //Display the cards the player can play
-        std::cout << "\n" << player_->getName() << "'s turn to issue orders.\n";
+        std::cout << "\n" << player_->getName() << "'s turn to play his cards.\n";
         player_->getHand()->showCards();
 
-        
-
-
-        //Manually issuing the orders
-        while (choice != 'n' && choice != 'y'){
-            std::cout << "Do you want to play a card? (y/n): ";
-            std::cin >> choice;
-        }
+        choice = this->choice("Do you want to play a card? (y/n): ");
 
         if (choice == 'n'){
             std::cout << "No card played this turn.\n";
             return;
         }else{
-            while(true){}
+            this->cardPhase(deck);
         }
+    }
+}
+
+void HumanPlayerStrategy::reinforcePhase() {
+    auto defendList = toDefend();
+        
+    for(Territory* t : defendList){
+        if(player_->reinforcementPool() <= 0){
+            std::cout << "No more reinforcements left to deploy.\n";
+            break;
+        }
+
+        std::cout << *t << std::endl;
+        
+        choice = this->choice("Do you want to deploy to " + t->getName() + "? (y/n): ");
+
+        if(choice == 'n'){
+            std::cout << "Do you want to continue deploying? (y/n): ";
+            std::cin >> choice;
+            if(choice == 'n'){
+                break;
+            }
+            continue;
+        }
+        else{
+            while(true){
+                std::cout << "You have " << player_->reinforcementPool() << " reinforcements left.\n";
+                int num;
+
+                std::cout << "Enter number of reinforcements to deploy to " << t->getName() << ": ";
+                std::cin >> num;
+                if(num > player_->reinforcementPool() || num <= 0){
+                    std::cout << "Invalid number of reinforcements. Try again next time.\n";
+                    continue;
+                }
+
+                player_->addOrder(new DeployOrder(player_, t, num));
+                player_->spendReinforcements(num);
+                break;
+            }         
+        }
+    }
+}
+
+void HumanPlayerStrategy::attackPhase() {
+    auto attackList = toAttack();
+    
+    for(Territory* t : attackList){
+
+        std::cout << *t << std::endl;
+        
+        choice = this->choice("Do you want to attack " + t->getName() + "? (y/n): ");
+
+        if(choice == 'n'){
+
+            choice = this->choice("Do you want to continue attacking? (y/n): ");
+
+            if(choice == 'n'){
+                break;
+            }
+            continue;
+        }
+        else{
+            
+            std::cout << "Territories to attack from:\n";
+            auto attackFrom = new std::vector<Territory*>();
+            int index = 0;
+            for (Territory* adj : t->getAdjacentTerritories()) {
+                if (adj->getPlayer() == player_) {
+                    attackFrom->push_back(adj);
+                    std::cout << "[" << index++ << "] " << *adj << std::endl;
+                }         
+            }
+
+            while(true){
+                std::cout << "Select territory to attack from (index): ";
+                std::cin >> index;
+                if(index >= attackFrom->size()){
+                    std::cout << "Invalid index." << std::endl;
+                    continue;
+                }
+                break;
+            }
+
+            Territory* fromTerritory = (*attackFrom)[index];
+
+            player_->addOrder(new AdvanceOrder(player_, fromTerritory, t, fromTerritory->getArmy()));
+        }
+    }
+}
+
+void HumanPlayerStrategy::cardPhase(Deck* deck) {
+    // To be implemented: logic for playing cards
+
+    int index;
+    while(true){
+        std::cout << "Enter the index of the card you want to play(0 or 1): ";
+        std::cin >> index;
+        if (index != 0 && index != 1){
+            std::cout << "Invalid index." << std::endl;
+            continue;
+        }
+        break;
+    }
+    player_->getHand()->playCard(index, player_, deck);
+
+    char choice = this->choice("Do you want to play the other card? (y/n): ");
+
+    if(choice == 'y'){
+        player_->getHand()->playCard(0, player_, deck);
     }
 }
 
