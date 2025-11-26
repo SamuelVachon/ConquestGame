@@ -66,7 +66,7 @@ std::vector<Territory*> HumanPlayerStrategy::toAttack() {
     return targets;
 }
 
-char HumanPlayerStrategy::choice(std::string type){
+char HumanPlayerStrategy::choice(std::string& type){
     char choice = 'a';
 
     while (choice != 'n' && choice != 'y'){
