@@ -2,8 +2,7 @@
 #include "Map.h"
 #include "Player.h"
 #include "LoggingObserver.h"
-#include "PlayerStrategies.h"
-#include <typeinfo>
+
 
 
 // Methods for Orders Class
