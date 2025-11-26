@@ -467,9 +467,10 @@ void AdvanceOrder::execute() {
     cout << getEffect() << endl;
 
     //Change the player type from neutral to aggresive if attacked
-    if (std::typeid(getTarget()->getPlayer()->getStrategy()) == typeid(NeutralPlayerStrategy)){
-        getTarget()->getPlayer()->setStrategy(new AggressivePlayerStrategy(getTarget()->getPlayer()));
-    }
+    if (dynamic_cast<NeutralPlayerStrategy*>(strat) != nullptr) {
+    getTarget()->getPlayer()->setStrategy(new AggressivePlayerStrategy(getTarget()->getPlayer()));
+}
+
     notify();                        // Part 5 addition (assign 2)
 }
 
