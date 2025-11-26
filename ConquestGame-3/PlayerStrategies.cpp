@@ -148,7 +148,7 @@ void HumanPlayerStrategy::reinforcePhase() {
                     continue;
                 }
 
-                player_->addOrder(new DeployOrder(player_, t, num));
+                player_->getOrders()->addOrder(new DeployOrder(player_, t, num));
                 player_->spendReinforcements(num);
                 break;
             }         
@@ -198,7 +198,7 @@ void HumanPlayerStrategy::attackPhase() {
 
             Territory* fromTerritory = (*attackFrom)[index];
 
-            player_->addOrder(new AdvanceOrder(player_, fromTerritory, t, fromTerritory->getArmy()));
+            player_->getOrders()->addOrder(new AdvanceOrder(player_, fromTerritory, t, fromTerritory->getArmy()));
         }
     }
 }
