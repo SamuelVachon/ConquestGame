@@ -1,5 +1,4 @@
-#ifndef PLAYER_STRATEGIES_H
-#define PLAYER_STRATEGIES_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -8,84 +7,79 @@ class Player;
 class Territory;
 class Deck;
 
+// ---------- Base Strategy ----------
+
 class PlayerStrategy {
 public:
-    explicit PlayerStrategy(Player* player);
-    virtual ~PlayerStrategy() = default;
+    explicit PlayerStrategy(Player* p);
+    PlayerStrategy(const PlayerStrategy& other);
+    virtual ~PlayerStrategy();
+    PlayerStrategy& operator=(const PlayerStrategy& other);
 
+    Player* getPlayer() const;
+    void setPlayer(Player* p);
+
+    // pure virtual behaviour
     virtual std::vector<Territory*> toDefend() = 0;
     virtual std::vector<Territory*> toAttack() = 0;
     virtual void issueOrder(Deck* deck) = 0;
 
-    virtual PlayerStrategy* clone(Player* newOwner) const = 0;
-    virtual std::string getName() const = 0;
-
 protected:
-    Player* player_;   // non-owning pointer to the player using this strategy
+    Player* player_;
 };
 
+// ---------- Concrete Strategies ----------
+
+// Human = same behaviour we currently have in Player::issueOrder/toDefend/toAttack
 class HumanPlayerStrategy : public PlayerStrategy {
 public:
-    explicit HumanPlayerStrategy(Player* player);
+    explicit HumanPlayerStrategy(Player* p);
 
     std::vector<Territory*> toDefend() override;
     std::vector<Territory*> toAttack() override;
     void issueOrder(Deck* deck) override;
-
-    PlayerStrategy* clone(Player* newOwner) const override;
-    std::string getName() const override;
+    void reinforcePhase();
+    void attackPhase();
+    void cardPhase(Deck* deck);
+    char choice(std::string& type);
 };
 
 class AggressivePlayerStrategy : public PlayerStrategy {
 public:
-    explicit AggressivePlayerStrategy(Player* player);
+    explicit AggressivePlayerStrategy(Player* p);
 
     std::vector<Territory*> toDefend() override;
     std::vector<Territory*> toAttack() override;
     void issueOrder(Deck* deck) override;
-
-    PlayerStrategy* clone(Player* newOwner) const override;
-    std::string getName() const override;
 };
 
 class BenevolentPlayerStrategy : public PlayerStrategy {
 public:
-    explicit BenevolentPlayerStrategy(Player* player);
+    explicit BenevolentPlayerStrategy(Player* p);
 
     std::vector<Territory*> toDefend() override;
     std::vector<Territory*> toAttack() override;
     void issueOrder(Deck* deck) override;
-
-    PlayerStrategy* clone(Player* newOwner) const override;
-    std::string getName() const override;
 };
 
 class NeutralPlayerStrategy : public PlayerStrategy {
 public:
-    explicit NeutralPlayerStrategy(Player* player);
+    explicit NeutralPlayerStrategy(Player* p);
 
     std::vector<Territory*> toDefend() override;
     std::vector<Territory*> toAttack() override;
     void issueOrder(Deck* deck) override;
-
-    PlayerStrategy* clone(Player* newOwner) const override;
-    std::string getName() const override;
 };
 
+// Cheater: conquers all adjacent enemy territories automatically
 class CheaterPlayerStrategy : public PlayerStrategy {
 public:
-    explicit CheaterPlayerStrategy(Player* player);
+    explicit CheaterPlayerStrategy(Player* p);
 
     std::vector<Territory*> toDefend() override;
     std::vector<Territory*> toAttack() override;
     void issueOrder(Deck* deck) override;
-
-    PlayerStrategy* clone(Player* newOwner) const override;
-    std::string getName() const override;
 };
 
-// Required driver
+
 void testPlayerStrategies();
-
-#endif // PLAYER_STRATEGIES_H
-
