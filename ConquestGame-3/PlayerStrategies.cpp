@@ -1,160 +1,212 @@
 #include "PlayerStrategies.h"
 #include "Player.h"
 #include "Map.h"
+#include "Orders.h"
+#include "Card.h"
 
 #include <algorithm>
 #include <iostream>
-#include <set>
 
-std::vector<Territory*> HumanPlayerStrategy::toDefend(Player* player) {
-   
-    return player->getTerritories();
+namespace {
+std::vector<Territory*> ownedTerritories(Player* player) {
+    if (!player) return {};
+    auto terrs = player->getTerritories();
+    if (!terrs) return {};
+    return *terrs;
 }
 
-std::vector<Territory*> HumanPlayerStrategy::toAttack(Player* /*player*/) {
-    
-    return {};
+Territory* strongest(std::vector<Territory*>& terrs) {
+    if (terrs.empty()) return nullptr;
+    return *std::max_element(
+        terrs.begin(), terrs.end(),
+        [](Territory* a, Territory* b) { return a->getArmy() < b->getArmy(); });
 }
 
-void HumanPlayerStrategy::issueOrder(Player* player) {
-    std::cout << "[Human] It is player '" << player->getName()
-              << "'s turn. (User input would go here.)\n";
+Territory* weakest(std::vector<Territory*>& terrs) {
+    if (terrs.empty()) return nullptr;
+    return *std::min_element(
+        terrs.begin(), terrs.end(),
+        [](Territory* a, Territory* b) { return a->getArmy() < b->getArmy(); });
+}
+} // namespace
+
+// ===== PlayerStrategy base =====
+PlayerStrategy::PlayerStrategy(Player* player)
+    : player_(player) {}
+
+// ===== Human =====
+HumanPlayerStrategy::HumanPlayerStrategy(Player* player)
+    : PlayerStrategy(player) {}
+
+std::vector<Territory*> HumanPlayerStrategy::toDefend() {
+    return ownedTerritories(player_);
 }
 
-PlayerStrategy* HumanPlayerStrategy::clone() const { return new HumanPlayerStrategy(*this); }
+std::vector<Territory*> HumanPlayerStrategy::toAttack() {
+    auto terrs = ownedTerritories(player_);
+    std::reverse(terrs.begin(), terrs.end());
+    return terrs;
+}
+
+void HumanPlayerStrategy::issueOrder(Deck* /*deck*/) {
+    if (!player_) return;
+    std::cout << "[Human] " << player_->getName()
+              << " would prompt for input and create orders.\n";
+}
+
+PlayerStrategy* HumanPlayerStrategy::clone(Player* newOwner) const {
+    return new HumanPlayerStrategy(newOwner);
+}
+
 std::string HumanPlayerStrategy::getName() const { return "Human"; }
 
-std::vector<Territory*> AggressivePlayerStrategy::toDefend(Player* player) {
-    // Defend strongest first (descending armies)
-    auto territories = player->getTerritories();
-    std::sort(territories.begin(), territories.end(),
-              [](Territory* a, Territory* b) { return a->getArmies() > b->getArmies(); });
-    return territories;
+// ===== Aggressive =====
+AggressivePlayerStrategy::AggressivePlayerStrategy(Player* player)
+    : PlayerStrategy(player) {}
+
+std::vector<Territory*> AggressivePlayerStrategy::toDefend() {
+    auto terrs = ownedTerritories(player_);
+    std::sort(terrs.begin(), terrs.end(),
+              [](Territory* a, Territory* b) { return a->getArmy() > b->getArmy(); });
+    return terrs;
 }
 
-std::vector<Territory*> AggressivePlayerStrategy::toAttack(Player* player) {
-    // All adjacent enemy territories
-    std::vector<Territory*> result;
-    std::set<Territory*> seen;
+std::vector<Territory*> AggressivePlayerStrategy::toAttack() {
+    auto terrs = ownedTerritories(player_);
+    std::reverse(terrs.begin(), terrs.end());
+    return terrs;
+}
 
-    for (Territory* t : player->getTerritories()) {
-        for (Territory* nb : t->getNeighbors()) {
-            if (nb->getOwner() != player && !seen.count(nb)) {
-                seen.insert(nb);
-                result.push_back(nb);
-            }
-        }
+void AggressivePlayerStrategy::issueOrder(Deck* /*deck*/) {
+    if (!player_) return;
+
+    auto terrs = ownedTerritories(player_);
+    Territory* target = strongest(terrs);
+    if (!target) {
+        std::cout << "[Aggressive] " << player_->getName()
+                  << " controls no territories.\n";
+        return;
     }
-    return result;
+
+    int pool = player_->reinforcementPool();
+    if (pool > 0 && player_->spendReinforcements(pool)) {
+        player_->getOrders()->addOrder(new DeployOrder(player_, target, pool));
+        std::cout << "[Aggressive] Deploys " << pool << " to " << target->getName() << ".\n";
+    } else {
+        // Fallback: still queue an advance placeholder
+        player_->getOrders()->addOrder(new AdvanceOrder(player_, target, target, 1));
+        std::cout << "[Aggressive] No reinforcements; queues advance from " << target->getName() << ".\n";
+    }
 }
 
-void AggressivePlayerStrategy::issueOrder(Player* player) {
-    std::cout << "[Aggressive] " << player->getName()
-              << " would advance from strongest territories into enemies.\n";
+PlayerStrategy* AggressivePlayerStrategy::clone(Player* newOwner) const {
+    return new AggressivePlayerStrategy(newOwner);
 }
 
-PlayerStrategy* AggressivePlayerStrategy::clone() const { return new AggressivePlayerStrategy(*this); }
 std::string AggressivePlayerStrategy::getName() const { return "Aggressive"; }
 
+// ===== Benevolent =====
+BenevolentPlayerStrategy::BenevolentPlayerStrategy(Player* player)
+    : PlayerStrategy(player) {}
 
-std::vector<Territory*> BenevolentPlayerStrategy::toDefend(Player* player) {
-    
-    auto territories = player->getTerritories();
-    std::sort(territories.begin(), territories.end(),
-              [](Territory* a, Territory* b) { return a->getArmies() < b->getArmies(); });
-    return territories;
+std::vector<Territory*> BenevolentPlayerStrategy::toDefend() {
+    auto terrs = ownedTerritories(player_);
+    std::sort(terrs.begin(), terrs.end(),
+              [](Territory* a, Territory* b) { return a->getArmy() < b->getArmy(); });
+    return terrs;
 }
 
-std::vector<Territory*> BenevolentPlayerStrategy::toAttack(Player* /*player*/) {
-    
-    return {};
+std::vector<Territory*> BenevolentPlayerStrategy::toAttack() {
+    return {};  // benevolent does not attack
 }
 
-void BenevolentPlayerStrategy::issueOrder(Player* player) {
-    auto defendList = toDefend(player);
-    if (defendList.empty()) {
-        std::cout << "[Benevolent] " << player->getName()
-                  << " controls no territories and issues no orders.\n";
+void BenevolentPlayerStrategy::issueOrder(Deck* /*deck*/) {
+    if (!player_) return;
+
+    auto terrs = ownedTerritories(player_);
+    Territory* target = weakest(terrs);
+    if (!target) {
+        std::cout << "[Benevolent] " << player_->getName()
+                  << " controls no territories.\n";
         return;
     }
 
-    Territory* weakest = defendList.front();
-    
-    weakest->addArmies(5);
+    int pool = player_->reinforcementPool();
+    int deploy = std::max(1, pool);
+    player_->spendReinforcements(deploy);
+    player_->getOrders()->addOrder(new DeployOrder(player_, target, deploy));
 
-    std::cout << "[Benevolent] " << player->getName()
-              << " reinforces weakest territory '"
-              << weakest->getName() << "', now with "
-              << weakest->getArmies() << " armies.\n";
+    std::cout << "[Benevolent] Reinforces weakest territory " << target->getName()
+              << " with " << deploy << " armies.\n";
 }
 
-PlayerStrategy* BenevolentPlayerStrategy::clone() const { return new BenevolentPlayerStrategy(*this); }
+PlayerStrategy* BenevolentPlayerStrategy::clone(Player* newOwner) const {
+    return new BenevolentPlayerStrategy(newOwner);
+}
+
 std::string BenevolentPlayerStrategy::getName() const { return "Benevolent"; }
 
-std::vector<Territory*> NeutralPlayerStrategy::toDefend(Player* player) {
-    return player->getTerritories();
+// ===== Neutral =====
+NeutralPlayerStrategy::NeutralPlayerStrategy(Player* player)
+    : PlayerStrategy(player) {}
+
+std::vector<Territory*> NeutralPlayerStrategy::toDefend() {
+    return ownedTerritories(player_);
 }
 
-std::vector<Territory*> NeutralPlayerStrategy::toAttack(Player* /*player*/) {
+std::vector<Territory*> NeutralPlayerStrategy::toAttack() {
     return {};
 }
 
-void NeutralPlayerStrategy::issueOrder(Player* player) {
-    std::cout << "[Neutral] " << player->getName()
-              << " stays neutral and issues no orders.\n";
+void NeutralPlayerStrategy::issueOrder(Deck* /*deck*/) {
+    if (!player_) return;
+    std::cout << "[Neutral] " << player_->getName()
+              << " issues no orders.\n";
 }
 
-PlayerStrategy* NeutralPlayerStrategy::clone() const { return new NeutralPlayerStrategy(*this); }
+PlayerStrategy* NeutralPlayerStrategy::clone(Player* newOwner) const {
+    return new NeutralPlayerStrategy(newOwner);
+}
+
 std::string NeutralPlayerStrategy::getName() const { return "Neutral"; }
 
-std::vector<Territory*> CheaterPlayerStrategy::toDefend(Player* player) {
-    return player->getTerritories();
+// ===== Cheater =====
+CheaterPlayerStrategy::CheaterPlayerStrategy(Player* player)
+    : PlayerStrategy(player) {}
+
+std::vector<Territory*> CheaterPlayerStrategy::toDefend() {
+    return ownedTerritories(player_);
 }
 
-std::vector<Territory*> CheaterPlayerStrategy::toAttack(Player* player) {
-    // All adjacent enemy territories (unique)
-    std::vector<Territory*> result;
-    std::set<Territory*> seen;
-
-    for (Territory* t : player->getTerritories()) {
-        for (Territory* nb : t->getNeighbors()) {
-            if (nb->getOwner() != player && !seen.count(nb)) {
-                seen.insert(nb);
-                result.push_back(nb);
-            }
-        }
-    }
-    return result;
+std::vector<Territory*> CheaterPlayerStrategy::toAttack() {
+    auto terrs = ownedTerritories(player_);
+    std::reverse(terrs.begin(), terrs.end());
+    return terrs;
 }
 
-void CheaterPlayerStrategy::issueOrder(Player* player) {
-    auto attackable = toAttack(player);
-    if (attackable.empty()) {
-        std::cout << "[Cheater] " << player->getName()
-                  << " has no adjacent enemy territories to automatically conquer.\n";
+void CheaterPlayerStrategy::issueOrder(Deck* /*deck*/) {
+    if (!player_) return;
+    // With limited map adjacency info, just double the armies on all owned territories.
+    auto terrs = ownedTerritories(player_);
+    if (terrs.empty()) {
+        std::cout << "[Cheater] " << player_->getName()
+                  << " controls no territories.\n";
         return;
     }
 
-    std::cout << "[Cheater] " << player->getName()
-              << " automatically conquers all adjacent enemies!\n";
-
-    for (Territory* enemy : attackable) {
-        Player* oldOwner = enemy->getOwner();
-        if (oldOwner && oldOwner != player) {
-            oldOwner->removeTerritory(enemy);
-        }
-        enemy->setOwner(player);
-        player->addTerritory(enemy);
-
-        std::cout << "    -> " << enemy->getName()
-                  << " is now owned by " << player->getName() << "\n";
+    for (Territory* t : terrs) {
+        t->setArmy(t->getArmy() * 2);
     }
+    std::cout << "[Cheater] Doubles armies on all owned territories.\n";
 }
 
-PlayerStrategy* CheaterPlayerStrategy::clone() const { return new CheaterPlayerStrategy(*this); }
+PlayerStrategy* CheaterPlayerStrategy::clone(Player* newOwner) const {
+    return new CheaterPlayerStrategy(newOwner);
+}
+
 std::string CheaterPlayerStrategy::getName() const { return "Cheater"; }
 
-
+// ===== Driver =====
 static void printTerritoryList(const std::string& label,
                                const std::vector<Territory*>& list) {
     std::cout << label;
@@ -164,7 +216,7 @@ static void printTerritoryList(const std::string& label,
     }
     std::cout << " ";
     for (Territory* t : list) {
-        std::cout << t->getName() << "(" << t->getArmies() << ") ";
+        std::cout << t->getName() << "(" << t->getArmy() << ") ";
     }
     std::cout << "\n";
 }
@@ -172,68 +224,50 @@ static void printTerritoryList(const std::string& label,
 void testPlayerStrategies() {
     std::cout << "===== testPlayerStrategies() =====\n";
 
-    // simple mini-map
-    Territory t1(1, "Alpha");
-    Territory t2(2, "Bravo");
-    Territory t3(3, "Charlie");
-    Territory t4(4, "Delta");
+    std::string mapFile = "./Maps/Earth.map";
+    MapLoader loader;
+    Map* map = loader.loadMap(mapFile);
+    if (!map) {
+        std::cout << "[ERROR] Could not load map " << mapFile << "\n";
+        return;
+    }
 
-    // adjacency
-    t1.addNeighbor(&t2);
-    t2.addNeighbor(&t1);
-    t2.addNeighbor(&t3);
-    t3.addNeighbor(&t2);
-    t3.addNeighbor(&t4);
-    t4.addNeighbor(&t3);
+    auto territories = map->getTerritories();
+    if (territories.size() < 3) {
+        std::cout << "[ERROR] Not enough territories in map to demo strategies.\n";
+        delete map;
+        return;
+    }
 
-    t1.setArmies(2);
-    t2.setArmies(8);
-    t3.setArmies(4);
-    t4.setArmies(1);
+    // Set some armies for comparison
+    territories[0]->setArmy(2);
+    territories[1]->setArmy(6);
+    territories[2]->setArmy(1);
 
-    Player benevolentPlayer("BenevolentPlayer", new BenevolentPlayerStrategy());
-    Player cheaterPlayer("CheaterPlayer", new CheaterPlayerStrategy());
+    Player aggressive("Aggressive");
+    aggressive.setStrategy(new AggressivePlayerStrategy(&aggressive));
+    aggressive.addTerritory(territories[0]);
+    aggressive.addTerritory(territories[1]);
+    aggressive.addReinforcements(5);
 
-    // ownership
-    t1.setOwner(&benevolentPlayer);
-    t2.setOwner(&benevolentPlayer);
-    t3.setOwner(&cheaterPlayer);
-    t4.setOwner(&cheaterPlayer);
-
-    benevolentPlayer.addTerritory(&t1);
-    benevolentPlayer.addTerritory(&t2);
-    cheaterPlayer.addTerritory(&t3);
-    cheaterPlayer.addTerritory(&t4);
+    Player benevolent("Benevolent");
+    benevolent.setStrategy(new BenevolentPlayerStrategy(&benevolent));
+    benevolent.addTerritory(territories[2]);
+    benevolent.addReinforcements(3);
 
     std::cout << "\n--- Before issuing orders ---\n";
-    printTerritoryList("Benevolent toDefend:", benevolentPlayer.toDefend());
-    printTerritoryList("Benevolent toAttack:", benevolentPlayer.toAttack());
-    printTerritoryList("Cheater toDefend:", cheaterPlayer.toDefend());
-    printTerritoryList("Cheater toAttack:", cheaterPlayer.toAttack());
+    printTerritoryList("Aggressive toDefend:", aggressive.toDefend());
+    printTerritoryList("Aggressive toAttack:", aggressive.toAttack());
+    printTerritoryList("Benevolent toDefend:", benevolent.toDefend());
+    printTerritoryList("Benevolent toAttack:", benevolent.toAttack());
 
     std::cout << "\n--- Issue orders ---\n";
-    benevolentPlayer.issueOrder();
-    cheaterPlayer.issueOrder();
+    aggressive.issueOrder();
+    benevolent.issueOrder();
 
-    std::cout << "\n--- After issuing orders ---\n";
-    std::cout << "Owner of Alpha: "
-              << (t1.getOwner() ? t1.getOwner()->getName() : "none") << "\n";
-    std::cout << "Owner of Bravo: "
-              << (t2.getOwner() ? t2.getOwner()->getName() : "none") << "\n";
-    std::cout << "Owner of Charlie: "
-              << (t3.getOwner() ? t3.getOwner()->getName() : "none") << "\n";
-    std::cout << "Owner of Delta: "
-              << (t4.getOwner() ? t4.getOwner()->getName() : "none") << "\n";
+    std::cout << "\n--- Orders queued ---\n";
+    std::cout << aggressive.getName() << " orders: " << *aggressive.getOrders() << "\n";
+    std::cout << benevolent.getName() << " orders: " << *benevolent.getOrders() << "\n";
 
-    // Dynamic strategy change demo (Neutral -> Aggressive)
-    std::cout << "\n--- Dynamic strategy change: Neutral -> Aggressive ---\n";
-    Player dynamicPlayer("Switcher", new NeutralPlayerStrategy());
-    t1.setOwner(&dynamicPlayer);
-    t2.setOwner(&dynamicPlayer);
-    dynamicPlayer.addTerritory(&t1);
-    dynamicPlayer.addTerritory(&t2);
-
-    dynamicPlayer.issueOrder();
-    dynamicPlayer.setStrategy(new AggressivePlayerStrategy());
-    dynamicPlayer.issueOrder();
+    delete map;
 }
