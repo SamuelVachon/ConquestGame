@@ -409,6 +409,7 @@ void testPlayerStrategies() {
     B->addAdjacentTerritory(C);
     C->addAdjacentTerritory(B);
 
+    // Create players
     Player* human      = new Player("Human");
     Player* aggressive = new Player("Aggressive");
     Player* benevolent = new Player("Benevolent");
@@ -447,6 +448,15 @@ void testPlayerStrategies() {
 
     std::cout << "\n--- Cheater turn ---\n";
     cheater->issueOrder(&deck);
+
+    // Demonstrating dynamic strategy change on the same player
+    std::cout << "Aggressive player will play one more turn, but with a new BenevolentPlayerStrategy.\n";
+
+    // Change the strategy object 
+    aggressive->setStrategy(new BenevolentPlayerStrategy(aggressive));
+
+    std::cout << "\n--- Aggressive player AFTER strategy change (now Benevolent) ---\n";
+    aggressive->issueOrder(&deck);
 
     delete human;
     delete aggressive;
