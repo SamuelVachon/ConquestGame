@@ -77,7 +77,7 @@ private:
     std::vector<Territory*>* terrs_;
     Hand*        hand_;
     OrdersList*  orders_;
-    int reinforcemtnts_;     // from your file (kept as-is)
+    
 
     // A2 fields
     int reinforce_ = 0;
