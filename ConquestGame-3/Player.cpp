@@ -17,7 +17,8 @@ Player::Player()
       terrs_(new std::vector<Territory*>()),
       hand_(new Hand()),
       orders_(new OrdersList()),
-      reinforcemtnts_(50),
+      reinforce_(0),
+      conqueredThisTurn_(false),
       strategy_(nullptr)
 {
     // You can default to Human strategy if you want:
@@ -30,7 +31,8 @@ Player::Player(const std::string& name)
       terrs_(new std::vector<Territory*>()),
       hand_(new Hand()),
       orders_(new OrdersList()),
-      reinforcemtnts_(50),
+      reinforce_(0),
+      conqueredThisTurn_(false),
       strategy_(nullptr)
 {
     // setStrategy(new HumanPlayerStrategy(this));
@@ -42,7 +44,8 @@ Player::Player(const Player& other)
       terrs_(nullptr),
       hand_(nullptr),
       orders_(nullptr),
-      reinforcemtnts_(0),
+      reinforce_(0),
+      conqueredThisTurn_(false),
       strategy_(nullptr)
 {
     deepCopyFrom(other);
@@ -50,20 +53,20 @@ Player::Player(const Player& other)
 
 // Destructor: clears all dynamically allocated members
 Player::~Player() {
-    delete name_;    name_ = nullptr;
-    delete terrs_;   terrs_ = nullptr;
-    delete hand_;    hand_ = nullptr;
-    delete orders_;  orders_ = nullptr;
+    delete name_;     name_ = nullptr;
+    delete terrs_;    terrs_ = nullptr;
+    delete hand_;     hand_ = nullptr;
+    delete orders_;   orders_ = nullptr;
     delete strategy_; strategy_ = nullptr;
 }
 
 /* Copy assignment operator */
 Player& Player::operator=(const Player& other) {
     if (this != &other) {
-        delete name_;    name_ = nullptr;
-        delete terrs_;   terrs_ = nullptr;
-        delete hand_;    hand_ = nullptr;
-        delete orders_;  orders_ = nullptr;
+        delete name_;     name_ = nullptr;
+        delete terrs_;    terrs_ = nullptr;
+        delete hand_;     hand_ = nullptr;
+        delete orders_;   orders_ = nullptr;
         delete strategy_; strategy_ = nullptr;
 
         deepCopyFrom(other);
@@ -175,12 +178,11 @@ void Player::deepCopyFrom(const Player& other) {
     // We own Hand and OrdersList → deep-copy them
     hand_  = new Hand(*other.hand_);
     orders_= new OrdersList(*other.orders_);
-    reinforcemtnts_ = other.reinforcemtnts_;
 
     // A2 Part 4 fields
-    reinforce_          = other.reinforce_;
-    conqueredThisTurn_  = other.conqueredThisTurn_;
-    negotiated_         = other.negotiated_;
+    reinforce_         = other.reinforce_;
+    conqueredThisTurn_ = other.conqueredThisTurn_;
+    negotiated_        = other.negotiated_;
 
     // Strategy pointer is NOT deep-copied here; new copy starts without strategy
     strategy_ = nullptr;
@@ -237,6 +239,7 @@ bool Player::hasTruceWith(Player* p) const {
     return false;
 }
 
+// Overload that takes a Deck (used by GameEngine)
 void Player::issueOrder(Deck* deck) {
     if (strategy_) {
         strategy_->issueOrder(deck);
