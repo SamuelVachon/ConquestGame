@@ -2,106 +2,104 @@
 #include "Map.h"
 #include "Player.h"
 #include "LoggingObserver.h"
-#include "PlayerStrategies.h"   
-#include <typeinfo>             
+#include "PlayerStrategies.h"
+#include <typeinfo>
 
+// =====================
+// Base Order class
+// =====================
 
-
-
-// Methods for Orders Class
 // Getters
- string Order::getDescription() const{
+string Order::getDescription() const {
     return *description;
- };
+}
 
- string Order::getEffect() const{
+string Order::getEffect() const {
     return *effect;
- };
+}
 
- Player* Order::getIssuer() const{
+Player* Order::getIssuer() const {
     return issuer;
- };
+}
 
- Territory* Order::getTarget() const{
+Territory* Order::getTarget() const {
     return target;
- };
+}
 
- // Setters 
- void Order::setDescription(const string& description){
-    if(this->description){
+// Setters
+void Order::setDescription(const string& description) {
+    if (this->description) {
         delete this->description;
     }
-    this->description=new string(description);
- };
+    this->description = new string(description);
+}
 
- void Order::setEffect(const string& effect){
-    if(this->effect){
+void Order::setEffect(const string& effect) {
+    if (this->effect) {
         delete this->effect;
     }
+    this->effect = new string(effect);
+}
 
-    this->effect=new string(effect);
- };
-
- void Order::setIssuer(Player* issuer) {
+void Order::setIssuer(Player* issuer) {
     this->issuer = issuer;
-};
+}
 
-void Order::setTarget(Territory* target){
-    this->target=target;
-};
+void Order::setTarget(Territory* target) {
+    this->target = target;
+}
 
 // Default Constructor
-Order::Order(){
-    this->description=new string("No description");
-    this->effect=new string("No effect");
-    this->issuer=nullptr;
-    this->target=nullptr;
-};
+Order::Order() {
+    this->description = new string("No description");
+    this->effect      = new string("No effect");
+    this->issuer      = nullptr;
+    this->target      = nullptr;
+}
 
-// Paramaterized Constructor
-Order::Order(const string& description, const string& effect,Player* issuer, Territory* target){
-    this->description=new string(description);
-    this->effect=new string(effect);
-    this->issuer=issuer;
-    this->target=target;
-};
+// Parameterized Constructor
+Order::Order(const string& description, const string& effect, Player* issuer, Territory* target) {
+    this->description = new string(description);
+    this->effect      = new string(effect);
+    this->issuer      = issuer;
+    this->target      = target;
+}
 
 // Copy Constructor
-Order::Order(const Order& other){
-    this->description=new string(*other.description);
-    this->effect=new string(*other.effect);
-    this->issuer=other.issuer;
-    this->target=other.target;
-};
+Order::Order(const Order& other) {
+    this->description = new string(*other.description);
+    this->effect      = new string(*other.effect);
+    this->issuer      = other.issuer;
+    this->target      = other.target;
+}
 
 // Destructor
-Order::~Order(){
+Order::~Order() {
     delete description;
     delete effect;
-};
+}
 
 // Assignment operator
-Order& Order::operator=(const Order& other){
-    if(this==&other){
+Order& Order::operator=(const Order& other) {
+    if (this == &other) {
         return *this;
     }
 
     delete description;
     delete effect;
 
-    description=new string(*other.description);
-    effect=new string(*other.effect);
-    issuer=other.issuer;
-    target=other.target;
+    description = new string(*other.description);
+    effect      = new string(*other.effect);
+    issuer      = other.issuer;
+    target      = other.target;
 
     return *this;
-
-};
+}
 
 // Stream operator
-ostream& operator <<(ostream& os, const Order& order){
-    os << "Order: "<< *order.description
-       << "| Effect: "<< *order.effect;
+ostream& operator<<(ostream& os, const Order& order) {
+    os << "Order: " << *order.description
+       << " | Effect: " << *order.effect;
 
     if (order.issuer) {
         os << " | Issuer: [Player exists]";
@@ -116,79 +114,81 @@ ostream& operator <<(ostream& os, const Order& order){
     }
 
     return os;
-};
-// Assignment 2 part 5 addition:
+}
+
+// Logging (Assignment 2 part 5)
 std::string Order::stringToLog() const {
-    // Keep the line simple for the log
     return "ORDER-EXECUTED " + getDescription() + " :: " + getEffect();
 }
 
-// Methods for Deploy Order Class
+// =====================
+// DeployOrder
+// =====================
 
 // Getter
-int DeployOrder::getNumArmies() const{
+int DeployOrder::getNumArmies() const {
     return *numArmies;
 }
 
 // Setter
-void DeployOrder::setNumArmies(int numArmies){
-    if(this->numArmies){
+void DeployOrder::setNumArmies(int numArmies) {
+    if (this->numArmies) {
         delete this->numArmies;
     }
-    this->numArmies= new int(numArmies);
+    this->numArmies = new int(numArmies);
 }
 
-// default Constructor
-DeployOrder::DeployOrder(){
-    this->numArmies=new int(0);
-};
+// Default Constructor
+DeployOrder::DeployOrder() {
+    this->numArmies = new int(0);
+}
 
-// Paramaterized Constructor
+// Parameterized Constructor
 DeployOrder::DeployOrder(Player* issuer, Territory* target, int numArmies)
-: Order("Deploy Order", "Pending", issuer, target)
-{
-    this->numArmies=new int(numArmies);
-};
+    : Order("Deploy Order", "Pending", issuer, target) {
+    this->numArmies = new int(numArmies);
+}
 
 // Copy Constructor
-DeployOrder::DeployOrder(const DeployOrder& other){
-    this->numArmies=new int(*other.numArmies);
-};
+DeployOrder::DeployOrder(const DeployOrder& other)
+    : Order(other) {
+    this->numArmies = new int(*other.numArmies);
+}
 
 // Assignment Operator
-DeployOrder& DeployOrder::operator=(const DeployOrder& other){
-    if(this==&other){
+DeployOrder& DeployOrder::operator=(const DeployOrder& other) {
+    if (this == &other) {
         return *this;
     }
 
-    delete numArmies;
+    Order::operator=(other);
 
-    this->numArmies=new int(*other.numArmies);
+    delete numArmies;
+    this->numArmies = new int(*other.numArmies);
 
     return *this;
-};
+}
 
 // Destructor
 DeployOrder::~DeployOrder() {
     delete numArmies;
-};
+    numArmies = nullptr;
+}
 
 // Validate Method
-
-bool DeployOrder::validate(){
+bool DeployOrder::validate() {
     if (getIssuer() == nullptr) {
-    cout << "Invalid: No player assigned.\n";
-    return false;
-}
+        cout << "Invalid: No player assigned.\n";
+        return false;
+    }
 
-if (getTarget() == nullptr) {
-    cout << "Invalid: No target assigned.\n";
-    return false;
-}
+    if (getTarget() == nullptr) {
+        cout << "Invalid: No target assigned.\n";
+        return false;
+    }
 
-// Ownership check player must actually own the target territory
-    
-    Player* issuer = getIssuer();
+    // Ownership check: player must actually own the target territory
+    Player*    issuer = getIssuer();
     Territory* target = getTarget();
 
     bool ownsTarget = false;
@@ -206,16 +206,18 @@ if (getTarget() == nullptr) {
         return false;
     }
 
-if (*numArmies <= 0) {
-    cout << "Invalid: Number of armies must be greater than 0.\n";
-    return false;
+    if (*numArmies <= 0) {
+        cout << "Invalid: Number of armies must be greater than 0.\n";
+        return false;
+    }
+
+    return true;
 }
 
-  return true;
-};
-
+// Execute Method
 void DeployOrder::execute() {
     cout << "\n[Executing Deploy Order...]\n";
+
     if (!validate()) {
         setEffect("Invalid order — deployment failed.");
         cout << getEffect() << endl;
@@ -223,28 +225,22 @@ void DeployOrder::execute() {
         return;
     }
 
-    Player* p = getIssuer();
+    // Armies were already removed from the reinforcement pool
+    // by the strategy (Human/Aggressive/Benevolent) using spendReinforcements()
     Territory* t = getTarget();
 
-    if (!p->spendReinforcements(*numArmies)) {
-        setEffect("Invalid: not enough armies in reinforcement pool.");
-        cout << getEffect() << endl;
-        notify();                    // Part 5 addition
-        return;
-    }
-
     t->setArmy(t->getArmy() + *numArmies);
-    setEffect("Deployed " + std::to_string(*numArmies) + " armies to " + t->getName() + ".");
+
+    setEffect("Deployed " + std::to_string(*numArmies) +
+              " armies to " + t->getName() + ".");
     cout << getEffect() << endl;
     notify();                        // Part 5 addition
 }
 
-
-
+// Stream operator
 ostream& operator<<(ostream& os, const DeployOrder& order) {
     os << "\n[DeployOrder]\n";
 
-    // Print basic details
     os << "  Issuer: ";
     if (order.getIssuer())
         os << order.getIssuer()->getName();
@@ -259,7 +255,6 @@ ostream& operator<<(ostream& os, const DeployOrder& order) {
         os << "(none)";
     os << "\n";
 
-    // Print number of armies
     os << "  Number of Armies: ";
     if (order.getNumArmies() > 0)
         os << order.getNumArmies();
@@ -267,7 +262,6 @@ ostream& operator<<(ostream& os, const DeployOrder& order) {
         os << "(invalid)";
     os << "\n";
 
-    // Print current effect message (if any)
     os << "  Effect: ";
     if (!order.getEffect().empty())
         os << order.getEffect();
@@ -276,52 +270,53 @@ ostream& operator<<(ostream& os, const DeployOrder& order) {
     os << "\n";
 
     return os;
-};
+}
 
-
-// Methods for Advance Order
+// =====================
+// AdvanceOrder
+// =====================
 
 // Getter
 Territory* AdvanceOrder::getSource() const {
     return source;
-};
+}
 
 int AdvanceOrder::getNumArmies() const {
     return *numArmies;
-};
+}
 
 // Setter
 void AdvanceOrder::setSource(Territory* source) {
     this->source = source;
-};
+}
 
 void AdvanceOrder::setNumArmies(int numArmies) {
     if (this->numArmies) {
         delete this->numArmies;
     }
     this->numArmies = new int(numArmies);
-};
+}
 
 // Default Constructor
 AdvanceOrder::AdvanceOrder()
     : Order("Advance", "Pending", nullptr, nullptr) {
-    this->source = nullptr;
+    this->source    = nullptr;
     this->numArmies = new int(0);
-};
+}
 
 // Parameterized Constructor
 AdvanceOrder::AdvanceOrder(Player* issuer, Territory* source, Territory* target, const int& numArmies)
     : Order("Advance", "Pending", issuer, target) {
-    this->source = source;
+    this->source    = source;
     this->numArmies = new int(numArmies);
-};
+}
 
 // Copy Constructor
 AdvanceOrder::AdvanceOrder(const AdvanceOrder& other)
     : Order(other) {
-    this->source = other.source;
+    this->source    = other.source;
     this->numArmies = new int(*other.numArmies);
-};
+}
 
 // Assignment Operator
 AdvanceOrder& AdvanceOrder::operator=(const AdvanceOrder& other) {
@@ -339,16 +334,15 @@ AdvanceOrder& AdvanceOrder::operator=(const AdvanceOrder& other) {
     this->numArmies = new int(*other.numArmies);
 
     return *this;
-};
+}
 
 // Destructor
 AdvanceOrder::~AdvanceOrder() {
     delete numArmies;
     numArmies = nullptr;
-};
+}
 
 // Validate method
-
 bool AdvanceOrder::validate() {
     if (getIssuer() == nullptr) {
         cout << "Invalid: No player assigned.\n";
@@ -356,9 +350,9 @@ bool AdvanceOrder::validate() {
     }
 
     // Negotiation rule: cannot attack if players have a truce
-     if (getTarget()->getPlayer() && getIssuer()->hasTruceWith(getTarget()->getPlayer())) {
-    cout << "Invalid: players are under negotiation (truce)." << endl;
-    return false;
+    if (getTarget()->getPlayer() && getIssuer()->hasTruceWith(getTarget()->getPlayer())) {
+        cout << "Invalid: players are under negotiation (truce)." << endl;
+        return false;
     }
 
     if (getSource() == nullptr || getTarget() == nullptr) {
@@ -371,9 +365,9 @@ bool AdvanceOrder::validate() {
         return false;
     }
 
-    Player* issuer = getIssuer();
-    Territory* src = getSource();
-    Territory* tgt = getTarget();
+    Player*    issuer = getIssuer();
+    Territory* src    = getSource();
+    Territory* tgt    = getTarget();
 
     // Check that player owns source
     bool ownsSource = false;
@@ -414,31 +408,32 @@ bool AdvanceOrder::validate() {
     }
 
     return true;
-};
+}
 
 // Execute Method
-
 void AdvanceOrder::execute() {
     cout << "\n[Executing Advance Order...]\n";
     if (!validate()) {
         setEffect("Invalid order — advance failed.");
         cout << getEffect() << endl;
-        notify();                    // Part 5 addition (assign 2)
+        notify();                    // Part 5 addition
         return;
     }
 
-    Player* issuer = getIssuer();
-    Territory* src = getSource();
-    Territory* tgt = getTarget();
-    int moving = *numArmies;
+    Player*    issuer = getIssuer();
+    Territory* src    = getSource();
+    Territory* tgt    = getTarget();
+    int        moving = *numArmies;
 
     src->setArmy(src->getArmy() - moving);
 
+    // If moving within own territories
     if (tgt->getPlayer() == issuer || tgt == src) {
         tgt->setArmy(tgt->getArmy() + moving);
-        setEffect("Moved " + to_string(moving) + " armies from " + src->getName() + " to " + tgt->getName() + ".");
+        setEffect("Moved " + to_string(moving) + " armies from " +
+                  src->getName() + " to " + tgt->getName() + ".");
         cout << getEffect() << endl;
-        notify();                    // Part 5 addition (assign 2)
+        notify();                    // Part 5 addition
         return;
     }
 
@@ -449,23 +444,27 @@ void AdvanceOrder::execute() {
     srand(static_cast<unsigned>(time(nullptr)));
     while (atk > 0 && def > 0) {
         int killsOnDef = 0;
-        for (int i = 0; i < atk; ++i) if ((rand() % 100) < 60) ++killsOnDef;
+        for (int i = 0; i < atk; ++i)
+            if ((rand() % 100) < 60) ++killsOnDef;
         def = max(0, def - killsOnDef);
         if (def == 0) break;
 
         int killsOnAtk = 0;
-        for (int i = 0; i < def; ++i) if ((rand() % 100) < 70) ++killsOnAtk;
+        for (int i = 0; i < def; ++i)
+            if ((rand() % 100) < 70) ++killsOnAtk;
         atk = max(0, atk - killsOnAtk);
     }
 
-     if (def == 0 && atk > 0) {
+    if (def == 0 && atk > 0) {
         tgt->setPlayer(issuer);
         tgt->setArmy(atk);
         issuer->markConquered();
-        setEffect("Conquered " + tgt->getName() + " with " + to_string(atk) + " surviving armies.");
+        setEffect("Conquered " + tgt->getName() + " with " +
+                  to_string(atk) + " surviving armies.");
     } else {
         tgt->setArmy(def);
-        setEffect("Attack failed on " + tgt->getName() + " (defenders left: " + to_string(def) + ").");
+        setEffect("Attack failed on " + tgt->getName() +
+                  " (defenders left: " + to_string(def) + ").");
     }
     cout << getEffect() << endl;
 
@@ -478,12 +477,10 @@ void AdvanceOrder::execute() {
         }
     }
 
-    notify();                        // Part 5 addition (assign 2)
+    notify();                        // Part 5 addition
 }
 
-
-// Stream Operator
-
+// Stream operator
 ostream& operator<<(ostream& os, const AdvanceOrder& order) {
     os << "\n[AdvanceOrder]\n";
 
@@ -523,37 +520,30 @@ ostream& operator<<(ostream& os, const AdvanceOrder& order) {
     os << "\n";
 
     return os;
-};
+}
 
-// CLASS: BombOrder
+// =====================
+// BombOrder
+// =====================
 
-// Represents a Bomb order: reduces the number of armies in an enemy territory by half
-
-// Default Constructor
 BombOrder::BombOrder()
-    : Order("Bomb", "Pending", nullptr, nullptr) {};
+    : Order("Bomb", "Pending", nullptr, nullptr) {}
 
-// Parameterized Constructor
 BombOrder::BombOrder(Player* issuer, Territory* target)
-    : Order("Bomb", "Pending", issuer, target) {};
+    : Order("Bomb", "Pending", issuer, target) {}
 
-// Copy Constructor
 BombOrder::BombOrder(const BombOrder& other)
-    : Order(other) {};
+    : Order(other) {}
 
-// Assignment Operator
 BombOrder& BombOrder::operator=(const BombOrder& other) {
     if (this == &other) {
         return *this;
     }
     Order::operator=(other);
     return *this;
-};
+}
 
-// Destructor
 BombOrder::~BombOrder() = default;
-
-// Validate
 
 bool BombOrder::validate() {
     if (getIssuer() == nullptr) {
@@ -566,7 +556,7 @@ bool BombOrder::validate() {
         return false;
     }
 
-    Player* issuer = getIssuer();
+    Player*    issuer = getIssuer();
     Territory* target = getTarget();
 
     // Player cannot bomb their own territory
@@ -598,9 +588,7 @@ bool BombOrder::validate() {
     }
 
     return true;
-};
-
-// Execute
+}
 
 void BombOrder::execute() {
     cout << "\n[Executing Bomb Order...]\n";
@@ -608,12 +596,12 @@ void BombOrder::execute() {
     if (!validate()) {
         setEffect("Invalid order — bombing failed.");
         cout << getEffect() << endl;
-        notify();                    // Part 5 addition (assign 2)
+        notify();
         return;
     }
 
     Territory* target = getTarget();
-    int originalArmies = target->getArmy();
+    int originalArmies  = target->getArmy();
     int destroyedArmies = originalArmies / 2;
 
     target->setArmy(destroyedArmies);
@@ -623,7 +611,6 @@ void BombOrder::execute() {
               to_string(originalArmies) + " to " + to_string(destroyedArmies) + ".");
     cout << getEffect() << endl;
 
-  
     // Change the player type from neutral to aggressive if bombed
     Player* defendingPlayer = target->getPlayer();
     if (defendingPlayer) {
@@ -633,12 +620,8 @@ void BombOrder::execute() {
         }
     }
 
-    notify();                        // Part 5 addition (assign 2)
+    notify();
 }
-
-
-
-// Stream Operator
 
 ostream& operator<<(ostream& os, const BombOrder& order) {
     os << "\n[BombOrder]\n";
@@ -665,38 +648,30 @@ ostream& operator<<(ostream& os, const BombOrder& order) {
     os << "\n";
 
     return os;
-};
+}
 
-// CLASS: BlockadeOrder
-// Represents a Blockade order: triples the armies on a territory and transfers
-// ownership to a neutral player.
+// =====================
+// BlockadeOrder
+// =====================
 
-// Default Constructor
 BlockadeOrder::BlockadeOrder()
-    : Order("Blockade", "Pending", nullptr, nullptr) {};
+    : Order("Blockade", "Pending", nullptr, nullptr) {}
 
-// Parameterized Constructor
 BlockadeOrder::BlockadeOrder(Player* issuer, Territory* target)
-    : Order("Blockade", "Pending", issuer, target) {};
+    : Order("Blockade", "Pending", issuer, target) {}
 
-// Copy Constructor
 BlockadeOrder::BlockadeOrder(const BlockadeOrder& other)
-    : Order(other) {};
+    : Order(other) {}
 
-// Assignment Operator
 BlockadeOrder& BlockadeOrder::operator=(const BlockadeOrder& other) {
     if (this == &other) {
         return *this;
     }
     Order::operator=(other);
     return *this;
-};
+}
 
-// Destructor
 BlockadeOrder::~BlockadeOrder() = default;
-
-
-// Validate
 
 bool BlockadeOrder::validate() {
     if (getIssuer() == nullptr) {
@@ -709,7 +684,7 @@ bool BlockadeOrder::validate() {
         return false;
     }
 
-    Player* issuer = getIssuer();
+    Player*    issuer = getIssuer();
     Territory* target = getTarget();
 
     // Player must own the target territory
@@ -723,13 +698,13 @@ bool BlockadeOrder::validate() {
 
     if (!ownsTarget) {
         cout << "Invalid: Player " << issuer->getName()
-             << " does not own the target territory " 
+             << " does not own the target territory "
              << target->getName() << ".\n";
         return false;
     }
 
     return true;
-};
+}
 
 static Player* getNeutralPlayer() {
     static Player neutral("Neutral");
@@ -741,7 +716,7 @@ void BlockadeOrder::execute() {
     if (!validate()) {
         setEffect("Invalid order — blockade failed.");
         cout << getEffect() << endl;
-        notify();                    // Part 5 addition (assign 2)
+        notify();
         return;
     }
 
@@ -749,13 +724,12 @@ void BlockadeOrder::execute() {
     int newArmies = t->getArmy() * 2;
     t->setArmy(newArmies);
     t->setPlayer(getNeutralPlayer());
-    setEffect("Blockade on " + t->getName() + ": doubled to " + to_string(newArmies) + " and transferred to Neutral.");
+
+    setEffect("Blockade on " + t->getName() + ": doubled to " +
+              to_string(newArmies) + " and transferred to Neutral.");
     cout << getEffect() << endl;
-    notify();                        // Part 5 addition (assign 2)
+    notify();
 }
-
-
-// Stream Operator
 
 ostream& operator<<(ostream& os, const BlockadeOrder& order) {
     os << "\n[BlockadeOrder]\n";
@@ -782,53 +756,53 @@ ostream& operator<<(ostream& os, const BlockadeOrder& order) {
     os << "\n";
 
     return os;
-};
+}
 
-// CLASS: AirliftOrder
+// =====================
+// AirliftOrder
+// =====================
 
 // Getters
-
 Territory* AirliftOrder::getSource() const {
     return source;
-};
+}
 
 int AirliftOrder::getNumArmies() const {
     return *numArmies;
-};
+}
 
 // Setters
-
 void AirliftOrder::setSource(Territory* source) {
     this->source = source;
-};
+}
 
 void AirliftOrder::setNumArmies(int numArmies) {
     if (this->numArmies) {
         delete this->numArmies;
     }
     this->numArmies = new int(numArmies);
-};
+}
 
 // Default Constructor
 AirliftOrder::AirliftOrder()
     : Order("Airlift", "Pending", nullptr, nullptr) {
-    this->source = nullptr;
+    this->source    = nullptr;
     this->numArmies = new int(0);
-};
+}
 
 // Parameterized Constructor
 AirliftOrder::AirliftOrder(Player* issuer, Territory* source, Territory* target, int numArmies)
     : Order("Airlift", "Pending", issuer, target) {
-    this->source = source;
+    this->source    = source;
     this->numArmies = new int(numArmies);
-};
+}
 
 // Copy Constructor
 AirliftOrder::AirliftOrder(const AirliftOrder& other)
     : Order(other) {
-    this->source = other.source;
+    this->source    = other.source;
     this->numArmies = new int(*other.numArmies);
-};
+}
 
 // Assignment Operator
 AirliftOrder& AirliftOrder::operator=(const AirliftOrder& other) {
@@ -844,15 +818,13 @@ AirliftOrder& AirliftOrder::operator=(const AirliftOrder& other) {
     this->numArmies = new int(*other.numArmies);
 
     return *this;
-};
+}
 
 // Destructor
 AirliftOrder::~AirliftOrder() {
     delete numArmies;
     numArmies = nullptr;
-};
-
-// Validate
+}
 
 bool AirliftOrder::validate() {
     if (getIssuer() == nullptr) {
@@ -870,9 +842,9 @@ bool AirliftOrder::validate() {
         return false;
     }
 
-    Player* issuer = getIssuer();
-    Territory* src = source;
-    Territory* tgt = getTarget();
+    Player*    issuer = getIssuer();
+    Territory* src    = source;
+    Territory* tgt    = getTarget();
 
     // Check ownership of source
     bool ownsSource = false;
@@ -911,9 +883,7 @@ bool AirliftOrder::validate() {
     }
 
     return true;
-};
-
-// Execute
+}
 
 void AirliftOrder::execute() {
     cout << "\n[Executing Airlift Order...]\n";
@@ -921,13 +891,13 @@ void AirliftOrder::execute() {
     if (!validate()) {
         setEffect("Invalid order — airlift failed.");
         cout << getEffect() << endl;
-        notify();                    // Part 5 addition (assign 2)
+        notify();
         return;
     }
 
     Territory* src = source;
     Territory* tgt = getTarget();
-    int movingArmies = *numArmies;
+    int        movingArmies = *numArmies;
 
     src->setArmy(src->getArmy() - movingArmies);
     tgt->setArmy(tgt->getArmy() + movingArmies);
@@ -935,11 +905,8 @@ void AirliftOrder::execute() {
     setEffect("Airlifted " + to_string(movingArmies) + " armies from " +
               src->getName() + " to " + tgt->getName() + ".");
     cout << getEffect() << endl;
-    notify();                        // Part 5 addition (assign 2)
+    notify();
 }
-
-
-// Stream Operator
 
 ostream& operator<<(ostream& os, const AirliftOrder& order) {
     os << "\n[AirliftOrder]\n";
@@ -980,39 +947,35 @@ ostream& operator<<(ostream& os, const AirliftOrder& order) {
     os << "\n";
 
     return os;
-};
+}
 
-// CLASS: NegotiateOrder
-
-// Getter and Setter
+// =====================
+// NegotiateOrder
+// =====================
 
 Player* NegotiateOrder::getOtherPlayer() const {
     return otherPlayer;
-};
+}
 
 void NegotiateOrder::setOtherPlayer(Player* otherPlayer) {
     this->otherPlayer = otherPlayer;
-};
+}
 
-// Default Constructor
 NegotiateOrder::NegotiateOrder()
     : Order("Negotiate", "Pending", nullptr, nullptr) {
     this->otherPlayer = nullptr;
-};
+}
 
-// Parameterized Constructor
 NegotiateOrder::NegotiateOrder(Player* issuer, Player* otherPlayer)
     : Order("Negotiate", "Pending", issuer, nullptr) {
     this->otherPlayer = otherPlayer;
-};
+}
 
-// Copy Constructor
 NegotiateOrder::NegotiateOrder(const NegotiateOrder& other)
     : Order(other) {
     this->otherPlayer = other.otherPlayer;
-};
+}
 
-// Assignment Operator
 NegotiateOrder& NegotiateOrder::operator=(const NegotiateOrder& other) {
     if (this == &other)
         return *this;
@@ -1021,12 +984,9 @@ NegotiateOrder& NegotiateOrder::operator=(const NegotiateOrder& other) {
     this->otherPlayer = other.otherPlayer;
 
     return *this;
-};
+}
 
-// Destructor
 NegotiateOrder::~NegotiateOrder() = default;
-
-// Validate
 
 bool NegotiateOrder::validate() {
     if (getIssuer() == nullptr) {
@@ -1045,16 +1005,14 @@ bool NegotiateOrder::validate() {
     }
 
     return true;
-};
-
-// Execute
+}
 
 void NegotiateOrder::execute() {
     cout << "\n[Executing Negotiate Order...]\n";
     if (!validate()) {
         setEffect("Invalid order — negotiation failed.");
         cout << getEffect() << endl;
-        notify();                    // Part 5 addition (assign 2)
+        notify();
         return;
     }
 
@@ -1063,13 +1021,11 @@ void NegotiateOrder::execute() {
     p1->addTruceWith(p2);
     p2->addTruceWith(p1);
 
-    setEffect("Negotiation established between " + p1->getName() + " and " + p2->getName() + " (no attacks this turn).");
+    setEffect("Negotiation established between " + p1->getName() +
+              " and " + p2->getName() + " (no attacks this turn).");
     cout << getEffect() << endl;
-    notify();                        // Part 5 addition (assign 2)
+    notify();
 }
-
-
-// Stream Operator
 
 ostream& operator<<(ostream& os, const NegotiateOrder& order) {
     os << "\n[NegotiateOrder]\n";
@@ -1096,41 +1052,40 @@ ostream& operator<<(ostream& os, const NegotiateOrder& order) {
     os << "\n";
 
     return os;
-};
+}
 
-// CLASS: OrdersList
+// =====================
+// OrdersList
+// =====================
 
-// Default Constructor
 OrdersList::OrdersList() {
     this->orders = new vector<Order*>();
-};
+}
 
-// Copy Constructor (deep copy)
+// Copy Constructor (shallow copy of pointers)
 OrdersList::OrdersList(const OrdersList& other) {
     this->orders = new vector<Order*>();
     for (Order* o : *other.orders) {
-        this->orders->push_back(o); 
+        this->orders->push_back(o);
     }
-};
+}
 
-// Assignment Operator (deep copy)
+// Assignment Operator (delete owned orders, then shallow copy pointers)
 OrdersList& OrdersList::operator=(const OrdersList& other) {
     if (this == &other)
         return *this;
 
-    // Delete old orders
     for (Order* o : *orders) {
         delete o;
     }
     orders->clear();
 
-    // Deep copy new ones
     for (Order* o : *other.orders) {
-        orders->push_back(o); 
+        orders->push_back(o);
     }
 
     return *this;
-};
+}
 
 // Destructor
 OrdersList::~OrdersList() {
@@ -1139,7 +1094,7 @@ OrdersList::~OrdersList() {
     }
     delete orders;
     orders = nullptr;
-};
+}
 
 // Returns pointer to the Order at a given index
 Order* OrdersList::getOrder(int index) const {
@@ -1148,12 +1103,12 @@ Order* OrdersList::getOrder(int index) const {
         return nullptr;
     }
     return (*orders)[index];
-};
+}
 
 // Returns the number of Orders in the list
 int OrdersList::size() const {
     return static_cast<int>(orders->size());
-};
+}
 
 // Deletes an Order at the specified index
 void OrdersList::removeOrder(int index) {
@@ -1167,7 +1122,7 @@ void OrdersList::removeOrder(int index) {
     orders->erase(orders->begin() + index);
 
     cout << "Order at index " << index << " removed successfully.\n";
-};
+}
 
 // Adds a new Order to the list
 void OrdersList::addOrder(Order* order) {
@@ -1178,16 +1133,15 @@ void OrdersList::addOrder(Order* order) {
     orders->push_back(order);
     cout << "Order added successfully.\n";
 
-    // Part 5 addition (assign 2)
+    // Part 5 addition (logging)
     lastAdded_ = order;
     notify();
 }
 
-
 // Moves an Order from one position to another
 void OrdersList::moveOrder(int fromIndex, int toIndex) {
     if (fromIndex < 0 || fromIndex >= static_cast<int>(orders->size()) ||
-        toIndex < 0 || toIndex >= static_cast<int>(orders->size())) {
+        toIndex   < 0 || toIndex   >= static_cast<int>(orders->size())) {
         cout << "Invalid index(es). Cannot move order.\n";
         return;
     }
@@ -1196,17 +1150,15 @@ void OrdersList::moveOrder(int fromIndex, int toIndex) {
     orders->erase(orders->begin() + fromIndex);
     orders->insert(orders->begin() + toIndex, temp);
 
-    cout << "Order moved from index " << fromIndex 
+    cout << "Order moved from index " << fromIndex
          << " to " << toIndex << ".\n";
-};
-
-// Part 5 addition (assign 2)
-std::string OrdersList::stringToLog() const {
-    return std::string("ORDER-ADDED ") + (lastAdded_ ? lastAdded_->getDescription() : "(null)");
 }
 
-
-// Stream Operator
+// Logging (Assignment 2 part 5)
+std::string OrdersList::stringToLog() const {
+    return std::string("ORDER-ADDED ") +
+           (lastAdded_ ? lastAdded_->getDescription() : "(null)");
+}
 
 ostream& operator<<(ostream& os, const OrdersList& ol) {
     os << "\n[OrdersList: " << ol.size() << " orders]\n";
@@ -1227,4 +1179,4 @@ ostream& operator<<(ostream& os, const OrdersList& ol) {
     }
 
     return os;
-};
+}
