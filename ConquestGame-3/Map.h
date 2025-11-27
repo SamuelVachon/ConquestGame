@@ -92,6 +92,7 @@ class Territory{
     int continent;
     Player* player;
     std::vector<std::string> edgesNames;
+    std::vector<Territory*> adjacentTerritories;
     
 };
 

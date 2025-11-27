@@ -104,6 +104,9 @@ Territory::Territory(Territory* territory){
     this->continentIndex = territory->continentIndex;
     this->edgesIndex = territory->edgesIndex;
     this->player = territory->player;
+    this->edgesNames = territory->edgesNames;
+    this->adjacentTerritories = territory->adjacentTerritories;
+    this->continent = territory->continent;
 }
 
 Territory::~Territory(){
@@ -134,6 +137,10 @@ void Territory::addEdges(int i){
 }
 void Territory::addEdgesNames(std::string& name){
     this->edgesNames.push_back(name);
+}
+
+void Territory::addAdjacentTerritory(Territory* terr){
+    this->adjacentTerritories.push_back(terr);
 }
 
 //Helper method for the validate function of the Class map, this function set the value of
@@ -211,6 +218,10 @@ int Territory::getArmy(){
 }
 Player* Territory::getPlayer(){
     return this->player;
+}
+
+vector<territory*> Territory::getAdjacentTerritories(){
+    return this->adjacentTerritories;
 }
 
 std::ostream& operator<<(std::ostream& os,const Territory& t){
@@ -349,6 +360,7 @@ void Map::setTerritoriesEdges(){
                 tempName = territories[i]->getName();
                 if(name.compare(tempName) == 0){
                     territory->addEdges(i);
+                    territory->addAdjacentTerritory(territories[i]);
                     break;
                 }
             }
