@@ -8,9 +8,9 @@
 class Territory;     // from Map
 class Hand;          // from Card.h
 class OrdersList;    // from Orders.h
-class Order;         
-class PlayerStrategy; // <-- Strategy pattern
-class Deck;  
+class Order;
+class PlayerStrategy; // Strategy pattern
+class Deck;
 
 void testPlayers();
 
@@ -36,17 +36,21 @@ public:
     // Strategy-aware behavior
     std::vector<Territory*> toDefend() const;
     std::vector<Territory*> toAttack() const;
-    void issueOrder();   // uses current strategy if available
+
+    // Issue orders
+    void issueOrder();         // no deck (used in some parts/tests)
+    void issueOrder(Deck* deck); // with deck (used by GameEngine / strategies)
 
     // Territory management
     void addTerritory(Territory* t);
-    std::vector<Territory*>* getTerritories();   // <-- required for strategies
+    std::vector<Territory*>* getTerritories();
 
+    // Add order helper
     void addOrder(Order* order);
 
     // Hand & Orders
-    void setHand(Hand* h);          
-    Hand* getHand() const;          
+    void setHand(Hand* h);
+    Hand* getHand() const;
     OrdersList* getOrders() const;
 
     // Reinforcements
@@ -64,12 +68,11 @@ public:
     bool hasTruceWith(Player* p) const;
 
     // Strategy control
-    void setStrategy(PlayerStrategy* s);    
+    void setStrategy(PlayerStrategy* s);
     PlayerStrategy* getStrategy() const;
 
     // Output
     friend std::ostream& operator<<(std::ostream& os, const Player& p);
-     void issueOrder(Deck* deck);
 
 private:
     // Required pointer-based members
@@ -77,7 +80,6 @@ private:
     std::vector<Territory*>* terrs_;
     Hand*        hand_;
     OrdersList*  orders_;
-    
 
     // A2 fields
     int reinforce_ = 0;
@@ -85,11 +87,8 @@ private:
     std::vector<Player*> negotiated_;
 
     // Strategy pattern
-    PlayerStrategy* strategy_;   // <-- added
+    PlayerStrategy* strategy_;
 
     // Internal deep copy helper
     void deepCopyFrom(const Player& other);
-   
 };
-
-
