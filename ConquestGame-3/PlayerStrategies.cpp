@@ -58,7 +58,8 @@ std::vector<Territory*> HumanPlayerStrategy::toAttack() {
     // same as your old Player::toAttack() logic (adjacent enemy territories) :contentReference[oaicite:1]{index=1}
     std::vector<Territory*> targets;
     for (Territory* t : *player_->getTerritories()) {
-        for (Territory* adj : t->getAdjacentTerritories()) {
+        std::vector<Territory*> adjacents = t->getAdjacentTerritories();
+        for (Territory* adj : adjacents) {
             if (adj->getPlayer() != player_ &&
                 std::find(targets.begin(), targets.end(), adj) == targets.end()) {
                 targets.push_back(adj);

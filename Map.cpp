@@ -220,7 +220,7 @@ Player* Territory::getPlayer(){
     return this->player;
 }
 
-vector<territory*> Territory::getAdjacentTerritories(){
+std::vector<Territory*> Territory::getAdjacentTerritories(){
     return this->adjacentTerritories;
 }
 
