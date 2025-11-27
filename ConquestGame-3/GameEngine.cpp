@@ -397,35 +397,22 @@ void GameEngine::assignTerritoriesRoundRobin() {
     auto territories = map_->getTerritories(); // vector<Territory*>
     if (territories.empty()) return;
 
-    size_t idxT =0;
-    size_t nTerritories = territories.size();
-    size_t nPlayers = players_->size();
-    Territory* t = territories[0];
-    Territory* temp;
+    int idxT;
+    int nTerritories = territories.size();
+    int nPlayers = players_->size();
+    int nPerPlayer = nTerritories / nPlayers;
+    int remainder = nTerritories % nPlayers;
     std::vector<Player*> players = *players_;
-    bool assigned = false;
+    int j = 0;
 
-    players[0]->addTerritory(t); // first territory to first player
-    Territory* toAdd = territories[t->getEdges()[idxT++]];
-
-    for (auto* p : players) {
-        while(p->toDefend().size() < (nTerritories / nPlayers) && !assigned){  
-            if(idxT >= t->getEdges().size()){
-                t = toAdd;
-                idxT=0;
-            }
-            temp = territories[t->getEdges()[idxT++]];
-            if(temp->getPlayer() == nullptr){
-                p->addTerritory(toAdd);
-                toAdd = temp;
-            }
-            for(auto* terr : territories){
-                if(terr->getPlayer() == nullptr){
-                    assigned = false;
-                    continue;
-                }
-                assigned = true;
-            }
+    for(int i=0; i < nPlayers; i++){
+        idxT += nPerPlayer;
+        if(remainder > 0){
+            idxT += 1;
+            remainder--;
+        }
+        for(j; j < idxT; j++){
+            players[i]->addTerritory(territories[j]);
         }
     }
 }
