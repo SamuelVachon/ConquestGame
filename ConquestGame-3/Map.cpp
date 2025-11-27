@@ -137,6 +137,10 @@ void Territory::addEdgesNames(std::string& name){
     this->edgesNames.push_back(name);
 }
 
+void Territory::addAdjacentTerritory(Territory* terr){
+    this->adjacentTerritories.push_back(terr);
+}
+
 //Helper method for the validate function of the Class map, this function set the value of
 //the isConnected attribute to true for all territories that can be reached stating from
 //the object instance on which it is called onto
@@ -212,6 +216,10 @@ int Territory::getArmy(){
 }
 Player* Territory::getPlayer(){
     return this->player;
+}
+
+std::vector<Territory*> Territory::getAdjacentTerritories(){
+    return this->adjacentTerritories;
 }
 
 std::ostream& operator<<(std::ostream& os,const Territory& t){
@@ -350,6 +358,7 @@ void Map::setTerritoriesEdges(){
                 tempName = territories[i]->getName();
                 if(name.compare(tempName) == 0){
                     territory->addEdges(i);
+                    territory->addAdjacentTerritory(territories[i]);
                     break;
                 }
             }
