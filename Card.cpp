@@ -48,6 +48,27 @@ string Card::getTypeAsString() const {
     }
 }
 
+Order* Card::createOrder(Player* player){
+    //Assignment didn't mention wether to give the player option to choose
+    switch(type){
+        case CardType::Bomb:
+            return new BombOrder(player, player->toAttack().front());
+        case CardType::Reinforcement:
+            return new DeployOrder(player,player->toDefend().front(),5);
+        case CardType::Blockade:
+            return new BlockadeOrder(player, player->toDefend().front());
+        case CardType::Airlift:
+            return new AirliftOrder(player, player->toDefend().front(), player->toAttack().front(), 5);
+        case CardType::Diplomacy:
+            {
+            Territory* adversary = player->toAttack().front();
+            return new NegotiateOrder(player, adversary->getPlayer());
+            }
+        default:
+            return nullptr;
+    }
+};
+
 void Card::play(Player* player, Deck* deck){
     if(!deck){
         throw std::invalid_argument("Cannot play card, deck cannot be null!");
@@ -55,7 +76,9 @@ void Card::play(Player* player, Deck* deck){
     if(!player){
         throw std::invalid_argument("Cannot play card, player cannot be null!");
     }
-    cout << "Playing " << getTypeAsString() << endl;
+    std::cout << player->getName() << " plays " << getTypeAsString() << " card.\n";
+    player->addOrder(createOrder(player));
+    player->getHand()->removeCard(this);
     deck->returnCard(this);
 }
 

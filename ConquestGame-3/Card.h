@@ -5,6 +5,16 @@
     using std::string;
 #include <vector>
     using std::vector;
+
+#include "Card.h"
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+#include <algorithm>
+#include <random>
+#include "Player.h"
+#include "Orders.h"
+#include "Map.h"
 class Player;
 class Deck;
 class Hand;
@@ -34,6 +44,7 @@ class Card{
 
         string getTypeAsString() const;
 
+        Order* createOrder(Player* player);
         void play(Player* player, Deck* deck);
 
         void play(Hand* hand, Deck* deck);
@@ -83,6 +94,9 @@ class Hand{
         void showCards();
 
         int size() const;
+
+        std::vector<Card*> getCards();
+           
 
         friend std::ostream& operator<<(std::ostream& out, const Hand& h);
 };

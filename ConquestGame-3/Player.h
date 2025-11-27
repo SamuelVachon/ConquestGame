@@ -42,6 +42,8 @@ public:
     void addTerritory(Territory* t);
     std::vector<Territory*>* getTerritories();   // <-- required for strategies
 
+    void addOrder(Order* order);
+
     // Hand & Orders
     void setHand(Hand* h);          
     Hand* getHand() const;          

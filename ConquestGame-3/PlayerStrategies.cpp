@@ -234,6 +234,10 @@ void HumanPlayerStrategy::cardPhase(Deck* deck) {
 
     int index;
     while(true){
+        int i =0;
+        for (Card* card : player_->getHand()->getCards()){
+            std::cout << "[" << i++ << "] " << *card << std::endl;
+        }
         std::cout << "Enter the index of the card you want to play(0 or 1): ";
         std::cin >> index;
         if (index != 0 && index != 1){
@@ -412,6 +416,7 @@ void CheaterPlayerStrategy::issueOrder(Deck* /*deck*/) {
             auto* vec = oldOwner->getTerritories();
             vec->erase(std::remove(vec->begin(), vec->end(), t), vec->end());
         }
+        
         t->setPlayer(player_);
         player_->addTerritory(t);
         std::cout << player_->getName()
@@ -458,7 +463,18 @@ void testPlayerStrategies() {
     neutral->setStrategy(new NeutralPlayerStrategy(neutral));
     cheater->setStrategy(new CheaterPlayerStrategy(cheater));
 
-    Deck deck(10);
+    Deck deck(52);
+
+    human->getHand()->addCard(deck.draw());
+    human->getHand()->addCard(deck.draw());
+    aggressive->getHand()->addCard(deck.draw());
+    aggressive->getHand()->addCard(deck.draw());
+    benevolent->getHand()->addCard(deck.draw());
+    benevolent->getHand()->addCard(deck.draw());
+    neutral->getHand()->addCard(deck.draw());
+    neutral->getHand()->addCard(deck.draw());
+    cheater->getHand()->addCard(deck.draw());
+    cheater->getHand()->addCard(deck.draw());
 
     std::cout << "\n--- Human turn ---\n";
     human->issueOrder(&deck);

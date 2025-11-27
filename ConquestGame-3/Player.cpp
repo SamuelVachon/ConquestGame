@@ -136,6 +136,12 @@ std::vector<Territory*>* Player::getTerritories() {
     return terrs_;
 }
 
+void Player::addOrder(Order* order){
+    if(order != nullptr){
+        orders_->addOrder(order);
+    }
+}
+
 // ============= Strategy pattern API =============
 
 void Player::setStrategy(PlayerStrategy* s) {
