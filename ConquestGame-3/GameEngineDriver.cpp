@@ -15,7 +15,7 @@ void testTournament() {
     std::cout << "testTournament() \n";
 
     // 1) Build a tournament command line (this should match the maps/strategies you pass to GameEngine)
-    std::string cmdLine = "tournament -M canada.map,europe.map "
+    std::string cmdLine = "tournament -M ./Maps/World.map,./Maps/Earth.map "
         "-P aggressive,benevolent,neutral "
         "-G 3 -D 10";
 
@@ -37,8 +37,8 @@ void testTournament() {
     GameEngine engine;
 
     std::vector<std::string> maps = {
-        "canada.map",
-        "europe.map"
+        "./Maps/World.map",
+        "./Maps/Earth.map"
     };
 
     std::vector<std::string> strategies = {
