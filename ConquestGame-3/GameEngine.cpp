@@ -412,6 +412,7 @@ void GameEngine::assignTerritoriesRoundRobin() {
             remainder--;
         }
         for(j; j < idxT; j++){
+            if(j >= nTerritories) break;
             players[i]->addTerritory(territories[j]);
         }
     }
